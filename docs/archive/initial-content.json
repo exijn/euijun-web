@@ -1,0 +1,177 @@
+{
+  "profile": {
+    "name": "한의준",
+    "englishName": "EUIJUN HAN",
+    "handle": "exijn",
+    "role": "Backend Developer",
+    "tagline": [
+      "서비스를 만들고,",
+      "운영하며 꾸준히 개선합니다."
+    ],
+    "introduction": "Kotlin과 Spring Boot를 중심으로 실제 사용자가 있는 서비스를 개발하고 운영합니다.",
+    "school": "광주소프트웨어마이스터고등학교",
+    "schoolDetail": "9기 · 2학년 재학",
+    "email": "hanej090224@gmail.com",
+    "github": "https://github.com/exijn",
+    "linkedin": "",
+    "website": "https://exijn.kr",
+    "domain": "exijn.kr",
+    "heroImage": "/images/profile/service-network.svg",
+    "about": [
+      "누군가의 일상에 쓰이는 서비스를 만듭니다. 교내 외출 관리부터 역량 인증, 세탁기 예약까지. 가까이에 있는 불편함을 발견하고, 백엔드로 해결하는 일을 좋아합니다.",
+      "기능을 구현하는 데서 멈추지 않습니다. 배포 이후의 오류와 데이터 정합성, 사용자의 피드백까지 살피며 서비스를 개선합니다. 그 과정에서 배운 것을 오픈소스에 돌려주고, 팀과 함께 다음 문제를 풀어갑니다."
+    ]
+  },
+  "projects": [
+    {
+      "id": "goms",
+      "name": "GOMS",
+      "category": "CAMPUS · OUTING MANAGEMENT",
+      "headline": "외출은 더 간편하게,\n관리는 더 정확하게.",
+      "description": "교내 외출·출결 관리를 돕는 서비스입니다. 백엔드 개발과 배포에 참여하고, 외출 상태 변경이 겹치는 상황의 데이터 정합성을 개선했습니다.",
+      "role": "Backend · 배포 · 유지보수",
+      "status": "교내 운영",
+      "technologies": [
+        "Kotlin",
+        "Spring Boot",
+        "MariaDB",
+        "Redis"
+      ],
+      "image": "/images/projects/goms/cover.svg",
+      "imageAlt": "GOMS의 외출 신청, 외출 중, 복귀 완료 흐름을 표현한 서비스 콘셉트",
+      "imageCaption": "SERVICE CONCEPT · 실제 서비스 화면이 아닌 자체 제작 이미지",
+      "github": "https://github.com/team-haribo/GOMS-Backend-V3",
+      "sourceUrl": "https://github.com/team-haribo/GOMS-Backend-V3/pull/94"
+    },
+    {
+      "id": "gsmc",
+      "name": "GSMC",
+      "category": "CAMPUS · GROWTH & CERTIFICATION",
+      "headline": "쌓아온 경험이\n성장으로 이어지도록.",
+      "description": "학생의 활동과 역량 인증을 관리하는 서비스입니다. 개발자 API와 프로젝트 관리 기능을 구현하고, 파일 업로드 확인 중 DB 연결이 오래 점유되는 문제를 개선했습니다.",
+      "role": "Backend · API · 데이터 처리",
+      "status": "V4 개발·개선",
+      "technologies": [
+        "Kotlin",
+        "Spring Boot",
+        "GraphQL",
+        "JPA"
+      ],
+      "image": "/images/projects/gsmc/cover.svg",
+      "imageAlt": "GSMC의 활동 기록과 인증 검토, 성장 이력을 표현한 서비스 콘셉트",
+      "imageCaption": "SERVICE CONCEPT · 실제 서비스 화면이 아닌 자체 제작 이미지",
+      "github": "https://github.com/team-incube/GSMC-Server-V4",
+      "sourceUrl": "https://github.com/team-incube/GSMC-Server-V4/pull/222"
+    },
+    {
+      "id": "washer",
+      "name": "Washer",
+      "category": "CAMPUS · EVERYDAY CONVENIENCE",
+      "headline": "기다림을 줄이는\n작은 일상의 변화.",
+      "description": "교내 세탁기·건조기 예약과 알림을 연결합니다. 예약부터 작동 확인, 사용 상태, 완료 알림까지 이어지는 백엔드에서 예약 경합 방지와 알림 안정성을 개선했습니다.",
+      "role": "Backend · 예약 · 알림",
+      "status": "예약·알림 기능 개선",
+      "technologies": [
+        "Java",
+        "Spring Boot",
+        "MySQL",
+        "Redis"
+      ],
+      "image": "/images/projects/washer/cover.svg",
+      "imageAlt": "Washer의 예약, 작동 확인, 세탁 중, 완료 알림을 표현한 서비스 콘셉트",
+      "imageCaption": "SERVICE CONCEPT · 실제 서비스 화면이 아닌 자체 제작 이미지",
+      "github": "https://github.com/team-washer/Washer-Backend-v2",
+      "sourceUrl": "https://github.com/team-washer/Washer-Backend-v2/pull/208"
+    }
+  ],
+  "openSource": {
+    "countLabel": "10+",
+    "countDescription": "merged contributions",
+    "scope": "9개 JVM 생태계 프로젝트에 기여",
+    "checkedAt": "2026-10-01",
+    "activityUrl": "https://github.com/search?q=is%3Apr+author%3Aexijn+is%3Amerged&type=pullrequests",
+    "image": "/images/open-source/jvm-ecosystem.svg",
+    "contributions": [
+      {
+        "name": "Gradle",
+        "category": "DOCUMENTATION",
+        "description": "Worker API의 WorkParameters 지원 타입을 문서화했습니다.",
+        "url": "https://github.com/gradle/gradle/pull/38952"
+      },
+      {
+        "name": "Jackson Databind",
+        "category": "SERIALIZATION",
+        "description": "BeanSerializerModifier에서 프로퍼티 직렬화기를 재정의할 수 있도록 개선했습니다.",
+        "url": "https://github.com/FasterXML/jackson-databind/pull/6173"
+      },
+      {
+        "name": "Java Operator SDK",
+        "category": "KUBERNETES",
+        "description": "종속 리소스의 API 버전 변경 감지를 구현하고, Kotlin 상호운용성 테스트에 기여했습니다.",
+        "url": "https://github.com/operator-framework/java-operator-sdk/pull/3536"
+      }
+    ]
+  },
+  "activities": [
+    {
+      "period": "2026 — 2027",
+      "title": "전교 학생회장",
+      "description": "광주소프트웨어마이스터고등학교 · 학생의 목소리를 듣고 함께 만드는 학교"
+    },
+    {
+      "period": "IN SCHOOL",
+      "title": "교내 개발 동아리",
+      "description": "함께 개발하고, 실제 교내 서비스를 운영하며 배우는 경험"
+    },
+    {
+      "period": "2025",
+      "title": "AI·SW 축전 운영 도우미",
+      "description": "기술을 만나는 현장에서 행사의 원활한 운영 지원"
+    },
+    {
+      "period": "TALK",
+      "title": "「내가 회장이 된 방법」",
+      "description": "도전과 그 과정에서 배운 것을 나눈 교내 발표"
+    }
+  ],
+  "skills": [
+    {
+      "name": "Backend",
+      "items": [
+        "Kotlin",
+        "Java",
+        "Spring Boot",
+        "Spring Security",
+        "JPA"
+      ]
+    },
+    {
+      "name": "Database",
+      "items": [
+        "MySQL",
+        "MariaDB",
+        "PostgreSQL",
+        "Redis"
+      ]
+    },
+    {
+      "name": "Infrastructure",
+      "items": [
+        "Docker",
+        "Nginx",
+        "GitHub Actions",
+        "Ubuntu"
+      ]
+    },
+    {
+      "name": "Interests",
+      "items": [
+        "Backend",
+        "Service Operation",
+        "DevOps",
+        "Open Source",
+        "PM"
+      ]
+    }
+  ]
+}

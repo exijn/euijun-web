@@ -1,0 +1,14 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "functions": { "api/index.ts": { "includeFiles": ".private/**", "maxDuration": 60 } },
+  "rewrites": [
+    { "source": "/manage", "destination": "/api/index" },
+    { "source": "/manage/:path*", "destination": "/api/index" },
+    { "source": "/auth/:path*", "destination": "/api/index" },
+    { "source": "/api/manage/:path*", "destination": "/api/index" },
+    { "source": "/private-assets/:path*", "destination": "/api/index" }
+  ]
+}

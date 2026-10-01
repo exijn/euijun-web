@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.idea/
+.env
+.env.*
+!.env.example
+test-results/
+playwright-report/
+*.tsbuildinfo
+.private/
+.vercel/
+.env.local

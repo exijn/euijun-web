@@ -1,0 +1,19 @@
+:root {
+  font-family: 'Segoe UI', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  --bg: #121212;
+  --surface: #181818;
+  --elevated: #202020;
+  --line: #303030;
+  --text: #f2f2f2;
+  --secondary: #a6a6a6;
+  --muted: #8c8c8c;
+  --accent: #adbaff;
+  --green: #a7c8ac;
+  --danger: #ffb3ac;
+  color: var(--text);
+  background: var(--bg);
+  color-scheme: dark;
+}
