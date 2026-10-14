@@ -60,6 +60,7 @@ main:focus, section:focus { outline: none; }
 .project-links { display: flex; gap: 22px; margin-top: 9px; flex-wrap: wrap; }
 .project-featured { display: block; padding-bottom: 30px; }
 .project-featured .project-body { display: grid; grid-template-columns: minmax(0, 1fr) 270px; gap: 40px; }
+.project-featured .project-body.no-image { display: block; }
 .project-featured h3 { font-size: 27px; }
 .project-featured .project-headline { margin-top: 7px; }
 .project-featured .project-status { display: none; }
@@ -68,9 +69,6 @@ main:focus, section:focus { outline: none; }
 .project-visual figcaption { padding: 10px 12px; color: var(--secondary); font-size: 12px; line-height: 1.7; }
 .project-visual img { width: 100%; height: 100%; object-fit: cover; transition: transform .25s; }
 .project-visual:hover img { transform: scale(1.015); }
-.image-placeholder { display: flex; height: 100%; min-height: 150px; flex-direction: column; justify-content: center; align-items: center; gap: 14px; color: var(--secondary); }
-.image-placeholder strong { color: #b9b9b9; font-size: 28px; font-weight: 500; letter-spacing: -1px; }
-.image-placeholder span { font-size: 12px; }
 .project-small-image { max-width: 350px; margin-top: 20px; }
 .contribution { display: grid; grid-template-columns: 170px 1fr auto; gap: 24px; border-top: 1px solid var(--line); padding: 20px 0; }
 .contribution h3 { font-size: 15px; font-weight: 500; }
@@ -129,8 +127,7 @@ main:focus, section:focus { outline: none; }
   .section-heading h2 { font-size: 19px; }
   .section-heading p { margin-top: 8px; line-height: 1.8; }
   .project-featured .project-body { display: block; }
-  .project-featured .project-visual { display: none; }
-  .project-featured .project-visual.has-image { display: block; margin-top: 20px; }
+  .project-featured .project-visual { margin-top: 20px; }
   .project { display: block; padding-block: 25px; }
   .project h3, .project-featured h3 { font-size: 23px; }
   .project-headline { margin-top: 9px; font-size: 15px; }

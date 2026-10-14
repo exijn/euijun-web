@@ -2,7 +2,7 @@
 
 ## 먼저 알아둘 점
 
-현재 저장소는 초기 커밋과 원격 브랜치가 없습니다. 이번 작업은 로컬 구현·모의 API 검증까지만 수행했습니다. 아래 설정, 초기 커밋·push, OAuth App 생성, 토큰 등록, 배포는 **소유자가 직접 승인하여 진행할 작업**입니다.
+코드는 GitHub `exijn/euijun-web`의 `main` 브랜치에 있습니다. OAuth App 생성, 토큰 등록, Vercel 프로젝트·도메인 연결과 실제 배포는 아직 진행하지 않았습니다. 이 설정은 소유자가 직접 준비해야 합니다.
 
 공개 화면은 정적 빌드입니다. 편집기는 서버에서 GitHub 기본 브랜치를 읽습니다. 브랜치에 이 코드와 `content/site.json`이 존재해야 사용할 수 있습니다. GitHub Pages에는 서버가 없어 안전한 편집 기능을 올릴 수 없습니다.
 
@@ -45,7 +45,7 @@ console.log(randomBytes(32).toString('base64'))
 
 ## Vercel 구성 (준비된 권장 경로)
 
-1. 소유자가 초기 코드를 원격에 등록한 후 저장소를 Vercel Git 연동으로 연결합니다.
+1. GitHub `exijn/euijun-web` 저장소를 Vercel Git 연동으로 연결합니다.
 2. Root Directory는 저장소 루트, Node.js **24.x**, Build Command는 `npm run build`, Output Directory는 `dist`입니다. `vercel.json`의 설정을 사용합니다.
 3. `api/index.ts`가 Node 함수입니다. 인증된 관리 HTML·JS·CSS는 `.private/**`에서 함수가 읽습니다. **`.private`를 정적 공개 폴더에 복사하지 마세요.** 공개 페이지의 JS에는 관리 코드가 없습니다.
 4. 서버 비밀 값은 **Production 환경에만** 등록하고, 외부 기여자 PR·fork·검증되지 않은 Preview에는 제공하지 마세요. 빌드 코드는 환경 변수에 접근할 수 있으므로 신뢰할 수 없는 코드를 secret이 있는 환경에서 실행하지 않습니다.
@@ -85,7 +85,7 @@ console.log(randomBytes(32).toString('base64'))
 - 기본 브랜치의 최신 SHA가 다르면 409로 중단합니다. Git 객체 생성 중 변경도 다시 검사합니다.
 - 기본 브랜치를 직접 PATCH/force update하지 않습니다. 내용 digest로 만든 `content/...` 브랜치를 새로 만들고 실제 기본 브랜치 대상으로 PR을 생성합니다.
 - 최종 검사와 PR 생성 사이에 원격 변경이 생길 수 있어 **브랜치 보호에서 최신 브랜치·필수 CI 검사를 요구**하세요. PR이므로 최신 기본 브랜치를 강제로 덮어쓰지는 않습니다.
-- `.github/workflows/check.yml`은 읽기 전용 권한으로 lint·타입·빌드·테스트를 실행하도록 준비했습니다. 운영 secret을 사용하지 않습니다. GitHub에서 한 번 실행된 뒤 branch protection의 필수 검사로 `checks`를 선택하세요. 실제 Actions 실행은 아직 하지 않았습니다.
+- `.github/workflows/check.yml`은 읽기 전용 권한으로 lint·타입·빌드·테스트를 실행하며 운영 secret을 사용하지 않습니다. 2026-10-01 `main` 실행의 `Site checks`는 성공했습니다. branch protection을 설정한다면 필수 검사로 `checks`를 선택하세요.
 - 같은 저장 재전송은 같은 브랜치로 향하며 기존 브랜치를 덮어쓰지 않습니다.
 - 네트워크/PR API 오류는 성공 처리하지 않습니다. 브랜치 또는 PR이 생성됐을 가능성을 알리므로 GitHub에서 확인한 뒤 복구하세요. 무조건 다시 저장하면 중복 브랜치 오류가 날 수 있습니다.
 - 기본 브랜치 변경 시 초안 내보내기 → 최신 내용 다시 불러오기 → 비교·재적용 순으로 처리합니다.

@@ -4,9 +4,9 @@ import { ExternalLink } from './components/ExternalLink'
 import { Icon } from './components/Icon'
 
 function ProjectImage({ project }: { project: Project }) {
-  return <figure className={'project-visual ' + (project.image ? 'has-image' : '')}>
-    <div className="project-image-frame">{project.image ? <img src={project.image} alt={project.imageAlt} width="960" height="720" loading="lazy" /> : <div className="image-placeholder"><strong>{project.name}</strong><span>프로젝트 이미지 준비 중</span></div>}</div>
-    {project.image && project.imageCaption && <figcaption>{project.imageCaption}</figcaption>}
+  return <figure className="project-visual">
+    <div className="project-image-frame"><img src={project.image} alt={project.imageAlt} width="960" height="720" loading="lazy" /></div>
+    {project.imageCaption && <figcaption>{project.imageCaption}</figcaption>}
   </figure>
 }
 
@@ -27,13 +27,13 @@ export function Site({ content, preview = false }: { content: SiteContent; previ
         <div className="project-list">{projects.map((project) => <article key={project.id} className={'project project-' + project.id + (project.featured ? ' project-featured' : '')}>
           {project.featured && <p className="featured-label">대표 프로젝트{project.status && ' · ' + project.status}</p>}
           {!project.featured && <div><h3>{project.name}</h3><p className="project-status">{project.status}</p></div>}
-          <div className={project.featured ? 'project-body' : 'project-main'}><div>
+          <div className={project.featured ? 'project-body' + (project.image ? '' : ' no-image') : 'project-main'}><div>
             {project.featured && <h3>{project.name}</h3>}
             <p className="project-headline">{project.headline}</p><p className="project-problem">{project.problem}</p>
             <p className="project-role">담당 · {project.role}</p><p className="project-result">{project.result}</p>
             <ul className="tech-list" aria-label={project.name + ' 기술'}>{project.technologies.map((tech) => <li key={tech}>{tech}</li>)}</ul>
             <div className="project-links"><ExternalLink href={project.github} className="link underlined" label={project.name + ' GitHub (새 탭)'}>GitHub<Icon name="arrow" /></ExternalLink><ExternalLink href={project.detailUrl || project.sourceUrl} className="link" label={project.name + ' 작업 기록 (새 탭)'}>{project.detailUrl ? '자세히 보기' : '작업 기록'}<Icon name="arrow" /></ExternalLink></div>
-          </div>{project.featured && <ProjectImage project={project} />}</div>
+          </div>{project.featured && project.image && <ProjectImage project={project} />}</div>
           {!project.featured && project.image && <div className="project-small-image"><ProjectImage project={project} /></div>}
         </article>)}</div>
       </section>

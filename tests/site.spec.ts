@@ -14,6 +14,7 @@ test('page layout, assets, links and accessibility', async ({ page }, testInfo) 
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(content.profile.name)
   await expect(page).toHaveTitle(`${content.profile.name} · ${content.profile.role}`)
   await expect(page.locator('.project-list > article')).toHaveCount(content.projects.length)
+  await expect(page.locator('.project-featured .project-visual')).toHaveCount(content.projects.filter((project) => project.featured && project.image).length)
 
   // Scroll normally through the complete page to load deferred images and reveal content.
   const height = await page.evaluate(() => document.documentElement.scrollHeight)
