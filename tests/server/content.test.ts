@@ -36,6 +36,20 @@ test('runtime schema rejects scripts in links, unknown fields, traversal, duplic
   assert.equal(contentSchema.safeParse({ ...initialContent, token: 'secret' }).success, false)
   assert.equal(contentSchema.safeParse({ ...initialContent, profile: { ...initialContent.profile, website: 'not-a-url' } }).success, false)
 })
+test('content validation rejects missing required fields and oversized collections before saving', async () => {
+  const { draft, service, state } = fixture()
+  draft.content.profile.name = ' '
+  assert.equal(contentSchema.safeParse(draft.content).success, false)
+  await assert.rejects(service.review(draft), /필수 항목/)
+
+  draft.content.profile.name = initialContent.profile.name
+  draft.content.projects = Array.from({ length: 21 }, (_, index) => ({
+    ...initialContent.projects[0], id: `project-${index}`, featured: false,
+  }))
+  assert.equal(contentSchema.safeParse(draft.content).success, false)
+  await assert.rejects(service.review(draft))
+  assert.equal(state.calls.some((call) => call.method === 'POST'), false)
+})
 test('unpublished and reverted data is removed before public bundling', () => {
   const content = structuredClone(initialContent)
   content.projects[0].published = false

@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { existsSync, readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
 import { contentSchema, publicContent } from './shared/content.ts'
 import { renderMetadata } from './shared/metadata.ts'
 
@@ -9,7 +10,7 @@ export default defineConfig({ plugins: [react(), {
   resolveId(id) { if (id === 'virtual:site-content') return '\0site-content' },
   load(id) {
     if (id !== '\0site-content') return
-    this.addWatchFile('content/site.json')
+    this.addWatchFile(resolve('content/site.json'))
     const content = contentSchema.parse(JSON.parse(readFileSync('content/site.json', 'utf8')))
     for (const project of content.projects.filter((item) => item.published && item.image)) {
       if (!existsSync('public' + project.image)) throw new Error(`Missing project image: ${project.image}`)
