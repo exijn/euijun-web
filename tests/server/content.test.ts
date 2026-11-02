@@ -26,6 +26,17 @@ test('metadata escapes edited content, preserves dollar strings, removes empty c
   assert.deepEqual(JSON.parse(data).sameAs, [])
   assert.doesNotMatch(data, /<script>/)
 })
+test('production metadata and sitemap use the configured domain', () => {
+  const { profile } = contentSchema.parse(JSON.parse(readFileSync('content/site.json', 'utf8')))
+  const html = readFileSync('dist/index.html', 'utf8')
+  const person = JSON.parse(html.match(/<script type="application\/ld\+json">(.*?)<\/script>/)![1])
+  assert.equal(person.url, profile.website)
+  assert.ok(html.includes(`rel="canonical" href="${profile.website}/"`))
+  assert.ok(html.includes(`property="og:url" content="${profile.website}/"`))
+  assert.ok(html.includes(`property="og:image" content="${profile.website}/images/og.png"`))
+  assert.ok(readFileSync('dist/robots.txt', 'utf8').includes(`${profile.website}/sitemap.xml`))
+  assert.ok(readFileSync('dist/sitemap.xml', 'utf8').includes(`<loc>${profile.website}/</loc>`))
+})
 test('runtime schema rejects scripts in links, unknown fields, traversal, duplicate IDs', () => {
   const content = structuredClone(initialContent)
   content.profile.github = 'javascript:alert(1)'; assert.equal(contentSchema.safeParse(content).success, false)
@@ -35,6 +46,20 @@ test('runtime schema rejects scripts in links, unknown fields, traversal, duplic
   content.projects.push(content.projects[0]); assert.equal(contentSchema.safeParse(content).success, false)
   assert.equal(contentSchema.safeParse({ ...initialContent, token: 'secret' }).success, false)
   assert.equal(contentSchema.safeParse({ ...initialContent, profile: { ...initialContent.profile, website: 'not-a-url' } }).success, false)
+})
+test('content validation rejects missing required fields and oversized collections before saving', async () => {
+  const { draft, service, state } = fixture()
+  draft.content.profile.name = ' '
+  assert.equal(contentSchema.safeParse(draft.content).success, false)
+  await assert.rejects(service.review(draft), /필수 항목/)
+
+  draft.content.profile.name = initialContent.profile.name
+  draft.content.projects = Array.from({ length: 21 }, (_, index) => ({
+    ...initialContent.projects[0], id: `project-${index}`, featured: false,
+  }))
+  assert.equal(contentSchema.safeParse(draft.content).success, false)
+  await assert.rejects(service.review(draft))
+  assert.equal(state.calls.some((call) => call.method === 'POST'), false)
 })
 test('unpublished and reverted data is removed before public bundling', () => {
   const content = structuredClone(initialContent)
