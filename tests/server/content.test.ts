@@ -26,6 +26,17 @@ test('metadata escapes edited content, preserves dollar strings, removes empty c
   assert.deepEqual(JSON.parse(data).sameAs, [])
   assert.doesNotMatch(data, /<script>/)
 })
+test('production metadata and sitemap use the configured domain', () => {
+  const { profile } = contentSchema.parse(JSON.parse(readFileSync('content/site.json', 'utf8')))
+  const html = readFileSync('dist/index.html', 'utf8')
+  const person = JSON.parse(html.match(/<script type="application\/ld\+json">(.*?)<\/script>/)![1])
+  assert.equal(person.url, profile.website)
+  assert.ok(html.includes(`rel="canonical" href="${profile.website}/"`))
+  assert.ok(html.includes(`property="og:url" content="${profile.website}/"`))
+  assert.ok(html.includes(`property="og:image" content="${profile.website}/images/og.png"`))
+  assert.ok(readFileSync('dist/robots.txt', 'utf8').includes(`${profile.website}/sitemap.xml`))
+  assert.ok(readFileSync('dist/sitemap.xml', 'utf8').includes(`<loc>${profile.website}/</loc>`))
+})
 test('runtime schema rejects scripts in links, unknown fields, traversal, duplicate IDs', () => {
   const content = structuredClone(initialContent)
   content.profile.github = 'javascript:alert(1)'; assert.equal(contentSchema.safeParse(content).success, false)

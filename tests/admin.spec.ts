@@ -21,6 +21,8 @@ test('private editor: keyboard, validation, CRUD, ordering, preview, review and 
   await expect(page.getByRole('alert')).toContainText('필수 항목')
   await page.getByLabel('이름', { exact: true }).fill('한의준')
   await page.getByLabel('핵심 문구').fill('테스트 소개 ' + testInfo.project.name)
+  await page.getByLabel('사이트 URL', { exact: true }).fill('https://exijn.com')
+  await page.getByLabel('표시할 도메인', { exact: true }).fill('exijn.com')
   await page.getByRole('button', { name: '프로젝트', exact: true }).click()
   await page.getByRole('button', { name: '+ 프로젝트 추가', exact: true }).click()
   const fourth = page.locator('.editor-item').nth(3)
@@ -46,6 +48,7 @@ test('private editor: keyboard, validation, CRUD, ordering, preview, review and 
   }
   await page.getByRole('button', { name: '변경 미리보기', exact: true }).click()
   await expect(page.getByRole('region', { name: '공개 화면 미리보기' })).toContainText('테스트 소개 ' + testInfo.project.name)
+  await expect(page.getByRole('region', { name: '공개 화면 미리보기' }).getByRole('link', { name: /exijn\.com/ })).toHaveAttribute('href', 'https://exijn.com')
   if (testInfo.project.name === '375px') await expect(page.getByAltText('업로드 검증용 이미지')).toBeVisible()
   await page.getByRole('button', { name: '편집으로 돌아가기' }).click()
   await page.getByRole('button', { name: '소개·연락처', exact: true }).click()
