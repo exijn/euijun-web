@@ -51,7 +51,7 @@ test('private editor: keyboard, validation, CRUD, ordering, preview, review and 
   await page.getByRole('button', { name: '소개·연락처', exact: true }).click()
   expect(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth)).toBe(false)
   expect((await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze()).violations).toEqual([])
-  await page.screenshot({ path: `docs/screenshots/redesign/${testInfo.project.name}-editor.png`, fullPage: true })
+  await page.screenshot({ path: testInfo.outputPath('editor.png'), fullPage: true })
   await page.getByRole('button', { name: '변경 내용 검토', exact: true }).click()
   await expect(page.getByRole('heading', { name: '저장 전 변경 확인' })).toBeVisible()
   await page.getByText('profile.tagline', { exact: true }).click()
