@@ -7,8 +7,13 @@
 
 ## Git과 배포
 
-- `main`에 직접 push하지 않는다. 작업은 별도 브랜치에서 하고, 의미 있는 단위로 커밋한 뒤 해당 브랜치를 push해 PR을 만든다. 브랜치 이름은 작업 내용에 맞게 정하거나 사용자가 지정한 이름을 쓰며, 특정 브랜치 이름을 고정 전제로 두지 않는다.
-- PR 병합, force push, main 직접 push, Vercel 운영 배포·환경 변수·DNS·OAuth App 변경은 사용자가 해당 작업에서 명시적으로 요청했을 때만 수행한다. 사용자가 다른 절차를 명시하면 그 지시를 우선한다.
+- 작업은 `main` 브랜치에서 하고, 검증을 통과한 커밋은 PR 없이 `origin/main`에 직접 push한다.
+- `main` push는 곧 Vercel 운영 배포(exijn.com)다. 그래서 push 전에 `npm run typecheck`, `npm run lint`, `npm test`, `npm run build`, `npm run test:e2e`, `git diff --check`를 모두 실행하고 통과해야 한다. 하나라도 실패하면 push하지 않고 보고한다.
+- push 직전에 `git fetch`로 `origin/main`을 확인한다. 원격이 앞서 있으면 `git pull --rebase`로 내 커밋을 위에 올리고, 충돌이 나면 멈추고 보고한다. force push는 하지 않는다.
+- 커밋은 의미 있는 단위로 나누고, 파일은 명시적으로 `git add`한다(`git add -A`, `git add .` 금지). Secret, `.env`, 임시 파일, 디자인 전달용 파일(zip, `docs/design/`)은 커밋하지 않는다.
+- push 후 GitHub Actions(checks)와 Vercel 운영 배포 상태를 확인해서 보고한다. 실패하면 원인을 보고하고, 되돌릴지(`git revert` 후 push) 사용자에게 묻는다.
+- 큰 작업이나 되돌리기 어려운 변경(스키마 마이그레이션, 의존성 대규모 변경, 인증·보안 코드 변경)은 push 전에 변경 요약을 보여주고 사용자 확인을 받는다.
+- Vercel 환경 변수·DNS·OAuth App 변경은 사용자가 해당 작업에서 명시적으로 요청했을 때만 수행한다. 사용자가 다른 절차를 명시하면 그 지시를 우선한다.
 - `reset --hard`, `git clean`, `stash`, force push와 사용자 변경 삭제, 검증 우회를 임의로 실행하지 않는다. 스테이징 전에 대상 파일과 diff를 확인하고, 관련 없는 변경과 비밀값을 커밋하지 않는다.
 
 ## 구조와 계약
@@ -20,7 +25,7 @@
 ## 검증과 보고
 
 - 코드 변경 시 `npm run typecheck`, `npm run lint`, `npm run build`, `npm test`, `npm run test:e2e`를 실행한다. Playwright는 Chromium과 localhost:4175를 사용한다. UI 변경은 320, 375, 768, 1024, 1440px 화면과 키보드, axe, reduced motion을 확인한다. 문서만 수정하면 문서 diff와 링크·명령의 정확성을 확인하고 실행하지 않은 검사를 명시한다.
-- 완료 보고에는 브랜치, 변경 내용과 주요 파일, 실행한 검사와 결과, 미검증 사항, 커밋 및 push 결과를 포함한다. 실제 OAuth·운영 배포·실물 기기 검증을 합성 테스트와 구분한다.
+- 완료 보고에는 push한 커밋 해시와 배포 상태, 변경 내용과 주요 파일, 실행한 검사와 결과, 미검증 사항, 커밋 및 push 결과를 포함한다. 실제 OAuth·운영 배포·실물 기기 검증을 합성 테스트와 구분한다.
 
 ## 디자인 스킬
 
