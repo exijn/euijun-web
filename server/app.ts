@@ -3,10 +3,12 @@ import { readFile } from 'node:fs/promises'
 import { resolve, sep, extname } from 'node:path'
 import { createHash } from 'node:crypto'
 import { z } from 'zod'
+import { handleUpload } from '@vercel/blob/client'
 import { contentSchema } from '../shared/content.ts'
 import type { Config } from './config.ts'
 import { GitHub, type Fetcher } from './github.ts'
 import { ContentService } from './content-service.ts'
+import { portfolioUploadConstraints } from './blob.ts'
 import { cookie, cookies, equal, HttpError, Limiter, OAUTH_COOKIE, random, readSession, seal, SESSION_COOKIE, unseal } from './security.ts'
 
 const MAX_BODY = 4 * 1024 * 1024
@@ -31,10 +33,10 @@ async function body(req: IncomingMessage) {
   try { return JSON.parse(Buffer.concat(chunks).toString('utf8')) as unknown } catch { throw new HttpError(400, 'JSON', 'JSON 형식이 올바르지 않습니다.') }
 }
 
-export function createHandler({ config, root = process.cwd(), fetcher = fetch }: { config: Config | null; root?: string; fetcher?: Fetcher }) {
+export function createHandler({ config, root = process.cwd(), fetcher = fetch, blobToken = null }: { config: Config | null; root?: string; fetcher?: Fetcher; blobToken?: string | null }) {
   const limiter = new Limiter()
   const github = config ? new GitHub(config, fetcher) : null
-  const service = github && config ? new ContentService(github, config) : null
+  const service = github && config ? new ContentService(github, config, blobToken, fetcher) : null
   async function serve(res: ServerResponse, directory: string, path: string, head = false) {
     const base = resolve(root, directory)
     const filename = resolve(base, '.' + path)
@@ -61,7 +63,9 @@ export function createHandler({ config, root = process.cwd(), fetcher = fetch }:
       res.setHeader('Vary', 'Cookie')
       res.setHeader('X-Robots-Tag', 'noindex, nofollow, noarchive')
       res.setHeader('Referrer-Policy', 'no-referrer')
-      res.setHeader('Content-Security-Policy', "default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' blob: data:; connect-src 'self'; font-src 'self'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'")
+      // connect-src allows https://vercel.com because the browser's @vercel/blob client uploads
+      // the portfolio PDF directly there; our server never sees the file bytes for that flow.
+      res.setHeader('Content-Security-Policy', "default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' blob: data:; connect-src 'self' https://vercel.com; font-src 'self'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'")
       if (!config || !github || !service) throw new HttpError(404, 'NOT_FOUND', 'Not found')
       // 클라이언트가 보낸 Host로 인증 URL을 만들지 않습니다.
       const stored = cookies(req.headers.cookie)
@@ -110,12 +114,23 @@ export function createHandler({ config, root = process.cwd(), fetcher = fetch }:
       if (/^\/private-assets\/assets\/[a-zA-Z0-9_-]+\.(js|css)$/.test(path) && req.method === 'GET') return await serve(res, '.private', path.replace('/private-assets', ''))
       if (path === '/api/manage/content' && req.method === 'GET') {
         const snapshot = await github.snapshot()
-        return send(res, 200, { content: contentSchema.parse(snapshot.content), baseSha: snapshot.sha, branch: snapshot.branch, csrf: session.csrf })
+        return send(res, 200, { content: contentSchema.parse(snapshot.content), baseSha: snapshot.sha, branch: snapshot.branch, csrf: session.csrf, blobEnabled: Boolean(blobToken) })
       }
       if (path === '/api/manage/review' && req.method === 'POST') return send(res, 200, await service.review(await body(req)))
       if (path === '/api/manage/save' && req.method === 'POST') return send(res, 201, await service.save(await body(req)))
       if (path === '/api/manage/logout' && req.method === 'POST') { res.setHeader('Set-Cookie', cookie(SESSION_COOKIE, '', 0)); return send(res, 200, { ok: true }) }
       if (path === '/api/manage/status' && req.method === 'GET' && /^\d{1,9}$/.test(url.searchParams.get('pr') ?? '')) return send(res, 200, await github.status(Number(url.searchParams.get('pr'))))
+      if (path === '/api/manage/blob-upload' && req.method === 'POST') {
+        if (!blobToken) throw new HttpError(404, 'NOT_FOUND', 'Not found')
+        const requestBody = await body(req)
+        try {
+          const result = await handleUpload({
+            request: req, body: requestBody as Parameters<typeof handleUpload>[0]['body'], token: blobToken,
+            onBeforeGenerateToken: async (pathname) => portfolioUploadConstraints(pathname),
+          })
+          return send(res, 200, result)
+        } catch (error) { throw new HttpError(422, 'BLOB_UPLOAD', error instanceof Error ? error.message : '업로드 토큰을 만들지 못했습니다.') }
+      }
       throw new HttpError(404, 'NOT_FOUND', 'Not found')
     } catch (error) {
       if (res.headersSent) { res.end(); return }

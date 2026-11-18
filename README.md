@@ -28,7 +28,9 @@ npm start
 | --- | --- |
 | 이름·직무·소개·학교 | `profile` |
 | GitHub·LinkedIn·이메일·도메인 | `profile.github / linkedin / email / website / domain` |
+| 증명사진·포트폴리오 PDF | `profile.photo`, `profile.portfolio` |
 | 프로젝트 | `projects` 배열 |
+| 프로젝트 화면 캡처·관련 문서 | `project.screenshots`, `project.documents` 배열 |
 | 해 온 일 | `ways` 배열 |
 | 오픈소스 | `openSource.contributions` 배열 |
 | 활동 | `activities` 배열 |
@@ -45,14 +47,26 @@ npm start
 
 ## 이미지 교체
 
-실제 화면이 확인되지 않은 프로젝트에는 이미지 영역을 표시하지 않습니다. 검증된 이미지를 추가하면 프로젝트에 표시됩니다.
+실제 화면이 확인되지 않은 프로젝트에는 이미지 영역을 표시하지 않습니다. 검증된 이미지를 추가하면 프로젝트에 표시됩니다. 용도별 저장 시 최대 치수는 다음과 같으며 모두 비율을 유지하고 자르지 않습니다.
 
-- 권장: **16:9**, 1600×900, 가능하면 200 KB 안팎의 WebP/AVIF. 표시 영역은 16:9 틀에 `object-fit: contain`으로 맞추므로 다른 비율의 이미지도 잘리지 않고 여백과 함께 표시됩니다.
-- 직접 수정: `public/images/projects/goms/cover.webp` 등에 파일을 추가하고 해당 프로젝트의 `image`를 `/images/projects/goms/cover.webp`로 설정합니다. `imageAlt`는 필수입니다. GSMC·Washer도 같은 방식입니다.
-- 웹 편집: 프로젝트의 이미지 업로드에서 선택하고 alt를 입력합니다. 서버가 검증·메타데이터 제거 후 최대 1600×900 안에서 비율을 유지해 WebP로 변환하고 `public/images/projects/uploads/<hash>.webp`에 저장합니다.
-- 정적 PNG/JPEG/WebP/AVIF만 허용합니다. 각 2 MB, 한 번에 최대 3개, 전체 JSON 요청 4 MB 제한입니다. SVG·움직이는 이미지·24 MP 초과 이미지는 거절됩니다.
+| 용도 | 최대 치수 | 비고 |
+| --- | --- | --- |
+| 프로젝트 대표 목업 (`project.image`) | 1600×900 (16:9) | 16:9 틀에 `object-fit: contain` |
+| 프로젝트 화면 캡처 (`project.screenshots`, 최대 4장) | 긴 변 1600 | 세로(앱)·가로(웹) 모두 가능, 썸네일 클릭 시 확대 보기 |
+| 증명사진 (`profile.photo`) | 800×800 | 연락 카드에는 정사각형으로 `object-fit: cover` 표시 |
+
+- 직접 수정: `public/images/projects/goms/cover.webp` 등에 파일을 추가하고 해당 프로젝트의 `image`를 `/images/projects/goms/cover.webp`로 설정합니다. `imageAlt`는 필수입니다. 캡처는 `screenshots[].image`, 사진은 `profile.photo.image`에 같은 방식으로 지정하며 각각 alt가 필수입니다.
+- 웹 편집: 해당 업로드 버튼에서 선택하고 alt를 입력합니다. 서버가 검증·메타데이터 제거 후 용도별 최대 치수 안에서 비율을 유지해 WebP로 변환하고 `public/images/<projects|profile>/uploads/<hash>.webp`에 저장합니다.
+- 정적 PNG/JPEG/WebP/AVIF만 허용합니다. 개별 이미지는 2 MB, 한 번에 최대 6개(대표 목업 1 + 캡처 최대 4 + 증명사진 1), 전체 JSON 요청은 4 MB 이하입니다. 편집기가 선택 즉시 브라우저에서 WebP로 줄여 보내므로 실제 전송량은 이보다 작습니다. SVG·움직이는 이미지·24 MP 초과 이미지는 거절됩니다.
 - 이미지를 지우려면 선택 중인 업로드를 취소하고 이미지 경로를 비웁니다. 기존 Git 파일은 자동 삭제하지 않아 복구할 수 있습니다.
 - 공유 이미지: `public/images/og.svg`를 수정하고 아래 명령으로 `og.png`를 다시 만드세요. OG 이미지의 문자 자체는 자동 갱신되지 않습니다. favicon은 `public/favicon.svg`입니다.
+
+## 포트폴리오 PDF
+
+- `profile.portfolio`에 `label`(버튼 문구), `url`(Vercel Blob 공개 주소), `updatedAt`을 저장합니다. 비어 있으면 첫 화면과 연락 카드의 포트폴리오 버튼 자체가 보이지 않습니다.
+- 웹 편집의 "소개·연락처" 탭에서 PDF를 선택하면 서버를 거치지 않고 브라우저에서 Vercel Blob으로 바로 올라갑니다(client upload, 최대 20 MB, `portfolio/` 경로). 저장(PR 생성) 시 서버가 URL이 이 프로젝트의 Blob 스토어 호스트인지, 파일이 실제 PDF(`%PDF-`로 시작)인지 다시 확인한 뒤에만 `content/site.json`에 반영합니다.
+- `BLOB_READ_WRITE_TOKEN`이 설정되지 않으면 업로드 버튼이 "스토리지 미설정" 안내로 바뀌고 나머지 편집 기능은 그대로 동작합니다. 설정 방법은 [관리자 설정 안내](docs/admin-setup.md)를 참고하세요.
+- 업로드된 PDF는 업로드 즉시 추측하기 어려운 공개 URL로 접근할 수 있지만, 공개 화면에 실제로 반영되는 것은 PR 병합 후입니다. 예전 PDF는 자동 삭제되지 않습니다.
 
 ```powershell
 npx playwright install chromium
@@ -91,7 +105,7 @@ npm run test:e2e
 - `content/site.json`: 편집 가능한 콘텐츠
 - `shared/content.ts`: TypeScript 타입·런타임 검증·비공개 항목 필터
 - `admin/`: 별도 편집 UI (빌드 결과 `.private/`, 공개 배포 폴더가 아님)
-- `server/`: OAuth·세션·CSRF·이미지 검증·GitHub 저장
+- `server/`: OAuth·세션·CSRF·이미지 검증·GitHub 저장·Vercel Blob 업로드 토큰 발급(`server/blob.ts`)
 - `api/index.ts`, `vercel.json`: 서버리스 연결
 - `tests/`: 보안·동시 수정·이미지·브라우저 회귀 검사
 - `docs/archive/initial-content.json`: 리디자인 전 실제 콘텐츠 보존본

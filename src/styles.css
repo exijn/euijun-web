@@ -148,6 +148,30 @@ a:hover { color: #ffffff; }
 .pd-foot { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 26px; }
 .pd-links { display: flex; gap: 8px; flex-wrap: wrap; }
 
+/* project screenshots */
+.shots { display: flex; gap: 10px; margin: 0 0 24px; padding-bottom: 4px; overflow-x: auto; scroll-snap-type: x proximity; }
+.shot-thumb { flex: none; height: 96px; padding: 0; border-radius: 10px; border: 1px solid var(--line); background: #17181d; cursor: pointer; overflow: hidden; scroll-snap-align: start; }
+.shot-thumb:hover { border-color: var(--brand-2); }
+.shot-thumb img { height: 100%; width: auto; display: block; object-fit: contain; }
+
+/* lightbox */
+.lightbox { padding: 0; border: 0; border-radius: 16px; background: var(--surface); color: var(--text); max-width: min(92vw, 1000px); max-height: 86vh; animation: enter .2s ease both; }
+.lightbox::backdrop { background: rgba(10, 11, 14, .78); }
+.lightbox-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; border-bottom: 1px solid var(--line); }
+.lightbox-count { color: var(--muted); font-size: 14px; }
+.lightbox-nav { display: flex; gap: 8px; }
+.lightbox-body { padding: 18px; max-height: calc(86vh - 58px); overflow: auto; }
+.lightbox-body img { display: block; max-width: 100%; max-height: calc(86vh - 110px); margin: 0 auto; object-fit: contain; }
+.lightbox-caption { margin: 14px 0 0; color: var(--muted); font-size: 15px; text-align: center; }
+
+/* project documents */
+.docs { list-style: none; margin: 14px 0 0; padding: 0; display: grid; gap: 8px; }
+.doc-link { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 14px; border-radius: 10px; border: 1px solid var(--line); color: var(--text); text-decoration: none; font-size: 15px; transition: background .15s; }
+.doc-link:hover { background: var(--surface2); color: var(--text); }
+.doc-link > svg:first-child { color: var(--muted); flex: none; }
+.doc-link em { font-style: normal; color: var(--soft); font-size: 13px; margin-left: auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.doc-link > svg:last-child { color: var(--soft); flex: none; }
+
 /* ways */
 .ways { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 36px; }
 .way { display: flex; flex-direction: column; gap: 10px; padding: 22px 0 0; border-top: 1px solid var(--line); }
@@ -175,7 +199,7 @@ a:hover { color: #ffffff; }
 
 /* contact */
 .card { display: grid; grid-template-columns: auto minmax(0, 1fr) minmax(0, 330px); gap: 28px; align-items: center; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 32px; }
-.avatar { width: 80px; height: 80px; border-radius: 20px; background: var(--brand-2); color: var(--brand-1); display: grid; place-items: center; font-size: 24px; font-weight: 700; }
+.avatar { width: 80px; height: 80px; border-radius: 20px; background: var(--brand-2); color: var(--brand-1); display: grid; place-items: center; font-size: 24px; font-weight: 700; object-fit: cover; }
 .card h3 { margin: 0; font-size: 24px; }
 .card .who { margin: 2px 0 0; color: var(--muted); }
 .card .msg { margin: 12px 0 0; font-size: 16px; }
@@ -232,5 +256,5 @@ a:hover { color: #ffffff; }
 }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .enter, .pdetail { animation: none; }
+  .enter, .pdetail, .lightbox { animation: none; }
 }

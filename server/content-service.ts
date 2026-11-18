@@ -3,11 +3,25 @@ import { z } from 'zod'
 import { contentSchema, type SiteContent } from '../shared/content.ts'
 import { GitHub } from './github.ts'
 import { digest, equal, HttpError, seal, unseal } from './security.ts'
+import { verifyPortfolioUrl, type Fetcher } from './blob.ts'
 import type { Config } from './config.ts'
 
+const RESIZE: Record<string, { width: number; height: number }> = {
+  profilePhoto: { width: 800, height: 800 },
+  projectImage: { width: 1600, height: 900 },
+  // A square bounding box with fit:'inside' caps whichever side is longer at 1600px, which is the
+  // generic way to enforce "longest edge <= 1600" for both portrait (app) and landscape (web) captures.
+  projectScreenshot: { width: 1600, height: 1600 },
+}
+const uploadItemSchema = z.object({
+  kind: z.enum(['profilePhoto', 'projectImage', 'projectScreenshot']),
+  projectId: z.string().regex(/^[a-z0-9-]{1,40}$/).optional(),
+  screenshotId: z.string().regex(/^[a-z0-9-]{1,40}$/).optional(),
+  data: z.string().max(1800000).regex(/^[A-Za-z0-9+/]+={0,2}$/),
+}).strict()
 const inputSchema = z.object({
   baseSha: z.string().regex(/^[a-f0-9]{40}$/), content: contentSchema,
-  uploads: z.array(z.object({ projectId: z.string().regex(/^[a-z0-9-]{1,40}$/), data: z.string().max(2800000).regex(/^[A-Za-z0-9+/]+={0,2}$/) }).strict()).max(3),
+  uploads: z.array(uploadItemSchema).max(6),
   reviewToken: z.string().max(4096).optional(),
 }).strict()
 export interface Change { path: string; before: string; after: string }
@@ -19,33 +33,53 @@ function differences(before: unknown, after: unknown, path = ''): Change[] {
   }
   return [{ path, before: JSON.stringify(before ?? null, null, 2), after: JSON.stringify(after ?? null, null, 2) }]
 }
-export async function prepare(value: unknown) {
+export async function prepare(value: unknown, blobToken: string | null = null, fetcher: Fetcher = fetch) {
   const parsed = inputSchema.safeParse(value)
   if (!parsed.success) throw new HttpError(422, 'VALIDATION', parsed.error.issues.map((item) => `${item.path.join('.')}: ${item.message}`).join('\n'))
   const input = parsed.data
   const content = structuredClone(input.content)
   const files: { path: string; data: Buffer }[] = []
-  const ids = new Set<string>()
+  const seen = new Set<string>()
   for (const upload of input.uploads) {
-    const project = content.projects.find((item) => item.id === upload.projectId)
-    if (!project || ids.has(upload.projectId)) throw new HttpError(422, 'IMAGE_PROJECT', '이미지의 프로젝트 ID가 없거나 중복되었습니다.')
-    ids.add(upload.projectId)
+    const dedupeKey = upload.kind === 'profilePhoto' ? 'profilePhoto' : upload.kind === 'projectImage' ? `projectImage:${upload.projectId}` : `projectScreenshot:${upload.projectId}:${upload.screenshotId}`
+    if (seen.has(dedupeKey)) throw new HttpError(422, 'IMAGE_TARGET', '같은 이미지 대상에 중복된 업로드가 있습니다.')
+    seen.add(dedupeKey)
     const bytes = Buffer.from(upload.data, 'base64')
     if (bytes.length > 2 * 1024 * 1024) throw new HttpError(413, 'IMAGE_SIZE', '이미지는 2 MB 이하여야 합니다.')
     const raster = bytes.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10])) || (bytes[0] === 255 && bytes[1] === 216 && bytes[2] === 255) || (bytes.toString('ascii', 0, 4) === 'RIFF' && bytes.toString('ascii', 8, 12) === 'WEBP') || (bytes.toString('ascii', 4, 8) === 'ftyp' && ['avif', 'avis'].includes(bytes.toString('ascii', 8, 12)))
     if (!raster) throw new HttpError(422, 'IMAGE_FORMAT', '지원하지 않는 이미지 형식입니다. SVG는 허용하지 않습니다.')
+    let data: Buffer
     try {
       const image = sharp(bytes, { limitInputPixels: 24000000, animated: false, failOn: 'warning' })
       const meta = await image.metadata()
       if (!['jpeg', 'png', 'webp', 'avif', 'heif'].includes(meta.format ?? '') || (meta.pages ?? 1) > 1) throw new Error('Invalid format')
-      const data = await image.rotate().resize({ width: 1600, height: 900, fit: 'inside', withoutEnlargement: true }).webp({ quality: 82 }).toBuffer()
-      const path = `public/images/projects/uploads/${digest(data)}.webp`
-      project.image = path.replace(/^public/, '')
-      files.push({ path, data })
+      const bounds = RESIZE[upload.kind]
+      data = await image.rotate().resize({ width: bounds.width, height: bounds.height, fit: 'inside', withoutEnlargement: true }).webp({ quality: 82 }).toBuffer()
     } catch { throw new HttpError(422, 'IMAGE_FORMAT', '유효한 정적 JPEG·PNG·WebP·AVIF 이미지만 사용할 수 있습니다. SVG·애니메이션·과도한 해상도는 허용하지 않습니다.') }
+    const prefix = upload.kind === 'profilePhoto' ? 'profile' : 'projects'
+    const path = `public/images/${prefix}/uploads/${digest(data)}.webp`
+    const publicPath = path.replace(/^public/, '')
+    files.push({ path, data })
+    if (upload.kind === 'profilePhoto') {
+      content.profile.photo.image = publicPath
+    } else {
+      const project = content.projects.find((item) => item.id === upload.projectId)
+      if (!project) throw new HttpError(422, 'IMAGE_PROJECT', '이미지의 프로젝트 ID를 찾을 수 없습니다.')
+      if (upload.kind === 'projectImage') {
+        project.image = publicPath
+      } else {
+        const shot = project.screenshots.find((item) => item.id === upload.screenshotId)
+        if (!shot) throw new HttpError(422, 'IMAGE_PROJECT', '이미지의 캡처 항목을 찾을 수 없습니다.')
+        shot.image = publicPath
+      }
+    }
+  }
+  if (content.profile.portfolio.url) {
+    if (!blobToken) throw new HttpError(422, 'PORTFOLIO_URL', '포트폴리오 PDF 저장소가 설정되지 않아 확인할 수 없습니다.')
+    await verifyPortfolioUrl(content.profile.portfolio.url, blobToken, fetcher)
   }
   const validated = contentSchema.safeParse(content)
-  if (!validated.success) throw new HttpError(422, 'VALIDATION', '업로드 이미지에 alt 설명을 입력하세요.')
+  if (!validated.success) throw new HttpError(422, 'VALIDATION', '업로드한 이미지에 설명(alt)을 입력하세요.')
   const fingerprint = digest(JSON.stringify({ baseSha: input.baseSha, content, files: files.map((file) => [file.path, digest(file.data)]) }))
   return { input, content, files, fingerprint }
 }
@@ -53,9 +87,11 @@ export async function prepare(value: unknown) {
 export class ContentService {
   github: GitHub
   config: Config
-  constructor(github: GitHub, config: Config) { this.github = github; this.config = config }
+  blobToken: string | null
+  fetcher: Fetcher
+  constructor(github: GitHub, config: Config, blobToken: string | null = null, fetcher: Fetcher = fetch) { this.github = github; this.config = config; this.blobToken = blobToken; this.fetcher = fetcher }
   async review(value: unknown) {
-    const prepared = await prepare(value)
+    const prepared = await prepare(value, this.blobToken, this.fetcher)
     const snapshot = await this.github.snapshot()
     if (snapshot.sha !== prepared.input.baseSha) throw new HttpError(409, 'STALE_HEAD', '기본 브랜치가 변경되었습니다. 초안을 보관한 뒤 최신 내용을 다시 불러와 비교하세요.')
     const original = contentSchema.parse(snapshot.content)
@@ -65,7 +101,7 @@ export class ContentService {
     return { changes, images: prepared.files.map((file) => file.path), reviewToken }
   }
   async save(value: unknown) {
-    const prepared = await prepare(value)
+    const prepared = await prepare(value, this.blobToken, this.fetcher)
     const ticket = z.object({ digest: z.string(), expires: z.number() }).safeParse(unseal(prepared.input.reviewToken, 'review', this.config))
     if (!ticket.success || ticket.data.expires <= Date.now() || !equal(ticket.data.digest, prepared.fingerprint)) throw new HttpError(409, 'REVIEW_REQUIRED', '변경 내용을 다시 확인한 뒤 저장하세요.')
     const head = await this.github.head()
@@ -94,4 +130,4 @@ export class ContentService {
   }
 }
 
-export type Draft = { baseSha: string; content: SiteContent; uploads: { projectId: string; data: string }[] }
+export type Draft = { baseSha: string; content: SiteContent; uploads: { kind: string; projectId?: string; screenshotId?: string; data: string }[] }

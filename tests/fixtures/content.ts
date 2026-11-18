@@ -4,16 +4,17 @@ import type { SiteContent, Project } from '../../shared/content.ts'
 const project = (id: string, name: string): Project => ({
   id, name, published: true, headline: '테스트용 서비스', team: '약 5명', role: 'Backend',
   status: '', color: '#dce2f0', technologies: ['Kotlin'], work: ['테스트용 작업'], note: '',
-  image: '', imageAlt: '', github: 'https://github.com/exijn',
+  image: '', imageAlt: '', github: 'https://github.com/exijn', screenshots: [], documents: [],
 })
 
 export const fixtureContent: SiteContent = {
-  schemaVersion: 2,
+  schemaVersion: 3,
   profile: {
     name: '한의준', englishName: 'EUIJUN HAN', role: 'Backend Developer',
     tagline: '편집 기능 검증용 소개입니다.', introduction: '합성 데이터로 편집 기능을 확인합니다.',
     school: '테스트 학교 소프트웨어학과 재학', schoolShort: '테스트 학교', email: 'test@example.com', github: 'https://github.com/exijn', linkedin: '',
     website: 'https://example.com', domain: 'example.com', contactText: '테스트용 연락 문구입니다.',
+    photo: { image: '', alt: '' }, portfolio: { label: '', url: '', updatedAt: '' },
   },
   projects: [project('goms', 'GOMS'), project('gsmc', 'GSMC'), project('washer', 'Washer')],
   ways: [{ id: 'sample', published: true, title: '테스트 항목', sub: 'GOMS', text: '합성 항목 데이터입니다.' }],
