@@ -13,7 +13,7 @@ export function renderMetadata(html: string, profile: SiteContent['profile']) {
   const sameAs = [profile.github, profile.linkedin].filter(Boolean)
   const person = { '@context': 'https://schema.org', '@type': 'Person', name: profile.name, alternateName: profile.englishName, url: profile.website, jobTitle: profile.role, sameAs }
   const links = [profile.github ? `<a href="${escape(profile.github)}">GitHub</a>` : '', profile.email ? `<a href="mailto:${escape(profile.email)}">이메일</a>` : ''].filter(Boolean).join(' · ')
-  return result.replaceAll('https://exijn.kr', () => profile.website.replace(/\/$/, ''))
+  return result.replaceAll('https://exijn.com', () => profile.website.replace(/\/$/, ''))
     .replace(/<script type="application\/ld\+json">[\s\S]*?<\/script>/, () => `<script type="application/ld+json">${JSON.stringify(person).replaceAll('<', '\\u003c')}</script>`)
     .replace(/<noscript>[\s\S]*?<\/noscript>/, () => `<noscript>${escape(title)}. ${escape(description)} ${links} 전체 소개를 보려면 JavaScript를 활성화해 주세요.</noscript>`)
 }

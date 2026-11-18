@@ -1,214 +1,226 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "profile": {
     "name": "한의준",
     "englishName": "EUIJUN HAN",
-    "handle": "exijn",
-    "role": "백엔드 개발자를 꿈꾸는 학생",
+    "role": "Backend Developer",
     "tagline": "서비스를 만들고, 운영하며 꾸준히 개선합니다.",
-    "introduction": "Kotlin과 Java, Spring Boot로 교내 서비스를 개발하고 있습니다.",
-    "school": "광주소프트웨어마이스터고등학교",
-    "schoolDetail": "9기 · 2학년 재학",
+    "introduction": "Kotlin·Java·Spring Boot로 학생들이 실제로 쓰는 교내 서비스를 개발하고 운영해 왔습니다.",
+    "school": "광주소프트웨어마이스터고등학교 소프트웨어개발과 재학",
+    "schoolShort": "광주소프트웨어마이스터고",
     "email": "hanej090224@gmail.com",
     "github": "https://github.com/exijn",
-    "linkedin": "",
-    "website": "https://exijn.kr",
-    "domain": "exijn.kr",
-    "about": [
-      "교내 외출 관리, 역량 인증, 세탁기 예약처럼 가까이 있는 문제를 백엔드로 해결하는 일을 좋아합니다.",
-      "기능을 만든 뒤에도 오류와 데이터 정합성을 살피며 개선합니다. 배운 것을 오픈소스에 기여하고 팀과 공유합니다."
-    ],
-    "contactText": "함께 이야기하고 싶다면 편하게 연락해 주세요."
+    "linkedin": "https://www.linkedin.com/in/uijun-han",
+    "website": "https://exijn.com",
+    "domain": "exijn.com",
+    "contactText": "프로젝트나 오픈소스 이야기라면 편하게 연락 주세요."
   },
   "projects": [
     {
       "id": "goms",
+      "published": true,
       "name": "GOMS",
-      "category": "CAMPUS · OUTING MANAGEMENT",
-      "headline": "교내 외출·출결 관리 서비스",
-      "description": "교내 외출·출결 관리를 돕는 서비스입니다. 백엔드 개발과 배포에 참여하고, 외출 상태 변경이 겹치는 상황의 데이터 정합성을 개선했습니다.",
-      "role": "Backend · 배포 · 유지보수",
+      "headline": "교내 외출 관리 서비스",
+      "team": "약 8명",
+      "role": "백엔드 파트리더 → 전체 PM",
       "status": "교내 운영",
-      "technologies": [
-        "Kotlin",
-        "Spring Boot",
-        "MariaDB",
-        "Redis"
+      "color": "#e3b183",
+      "technologies": ["Kotlin", "Spring Boot", "MariaDB", "Redis"],
+      "work": [
+        "DB ERD와 API 명세 설계·작성",
+        "주요 API 개발",
+        "서버 배포와 SSL 인증서 적용",
+        "운영과 모니터링"
       ],
+      "note": "기능 구현에서 끝나지 않고, 학생들이 실제로 쓰는 흐름과 운영 중 생기는 문제까지 맡았습니다.",
       "image": "",
       "imageAlt": "",
-      "imageCaption": "",
-      "github": "https://github.com/team-haribo/GOMS-Backend-V3",
-      "sourceUrl": "https://github.com/team-haribo/GOMS-Backend-V3/pull/94",
-      "problem": "학생의 외출과 복귀를 간편하게 기록하고, 동시에 바뀌는 상태를 정확하게 관리해야 했습니다.",
-      "result": "외출 상태 변경 경합에서 데이터 정합성을 개선했습니다.",
-      "detailUrl": "",
-      "published": true,
-      "featured": true
-    },
-    {
-      "id": "gsmc",
-      "name": "GSMC",
-      "category": "CAMPUS · GROWTH & CERTIFICATION",
-      "headline": "교내 역량 인증 관리 서비스",
-      "description": "학생의 활동과 역량 인증을 관리하는 서비스입니다. 개발자 API와 프로젝트 관리 기능을 구현하고, 파일 업로드 확인 중 DB 연결이 오래 점유되는 문제를 개선했습니다.",
-      "role": "Backend · API · 데이터 처리",
-      "status": "V4 개발·개선",
-      "technologies": [
-        "Kotlin",
-        "Spring Boot",
-        "GraphQL",
-        "JPA"
-      ],
-      "image": "",
-      "imageAlt": "",
-      "imageCaption": "",
-      "github": "https://github.com/team-incube/GSMC-Server-V4",
-      "sourceUrl": "https://github.com/team-incube/GSMC-Server-V4/pull/222",
-      "problem": "학생의 활동 기록과 인증 데이터를 안정적으로 처리하고 관리할 수 있어야 했습니다.",
-      "result": "개발자 API와 프로젝트 관리 기능을 구현했습니다. 파일 업로드 확인 중 DB 연결 점유 문제를 개선했습니다.",
-      "detailUrl": "",
-      "published": true,
-      "featured": false
+      "github": "https://github.com/team-haribo/GOMS-Backend-V3"
     },
     {
       "id": "washer",
+      "published": true,
       "name": "Washer",
-      "category": "CAMPUS · EVERYDAY CONVENIENCE",
-      "headline": "세탁기·건조기 예약 및 알림 서비스",
-      "description": "교내 세탁기·건조기 예약과 알림을 연결합니다. 예약부터 작동 확인, 사용 상태, 완료 알림까지 이어지는 백엔드에서 예약 경합 방지와 알림 안정성을 개선했습니다.",
-      "role": "Backend · 예약 · 알림",
-      "status": "예약·알림 기능 개선",
-      "technologies": [
-        "Java",
-        "Spring Boot",
-        "MySQL",
-        "Redis"
+      "headline": "기숙사 세탁기·건조기 서비스",
+      "team": "약 6명",
+      "role": "전체 리더 · 백엔드 파트리더",
+      "status": "교내 운영",
+      "color": "#9cc3e6",
+      "technologies": ["Java", "Spring Boot", "MySQL", "Redis"],
+      "work": [
+        "유지보수로 합류한 뒤 전체 리더를 맡아 개발팀 조율",
+        "앱·클라이언트 이슈 확인과 실제 사용자 문의 대응",
+        "기기 상태·예약·알림에서 생기는 예외 상황 분석"
       ],
+      "note": "",
       "image": "",
       "imageAlt": "",
-      "imageCaption": "",
-      "github": "https://github.com/team-washer/Washer-Backend-v2",
-      "sourceUrl": "https://github.com/team-washer/Washer-Backend-v2/pull/208",
-      "problem": "예약부터 작동 확인, 완료 알림까지 끊기지 않는 사용 흐름이 필요했습니다.",
-      "result": "예약 경합 방지와 알림 안정성을 개선했습니다. 외부 기기 제어와 신규 예약이 겹치는 상황을 처리했습니다.",
-      "detailUrl": "",
+      "github": "https://github.com/team-washer/Washer-Backend-v2"
+    },
+    {
+      "id": "gsmc",
       "published": true,
-      "featured": false
+      "name": "GSMC",
+      "headline": "교내 역량 인증 관련 서비스",
+      "team": "약 10명",
+      "role": "통합 리더",
+      "status": "개발 중 · 운영 예정",
+      "color": "#c0b0e3",
+      "technologies": ["Kotlin", "Spring Boot", "GraphQL", "JPA"],
+      "work": [
+        "팀 전체 요구사항과 일정 조율",
+        "후배 개발자 온보딩",
+        "담당 선생님과 주기적인 소통",
+        "협업 과정과 결정 사항 문서화"
+      ],
+      "note": "",
+      "image": "",
+      "imageAlt": "",
+      "github": "https://github.com/team-incube/GSMC-Server-V4"
+    }
+  ],
+  "ways": [
+    {
+      "id": "design",
+      "published": true,
+      "title": "설계하고 만들기",
+      "sub": "GOMS",
+      "text": "DB ERD와 API 명세를 먼저 정리하고, 그 기준으로 주요 API를 개발했습니다."
+    },
+    {
+      "id": "operate",
+      "published": true,
+      "title": "배포하고 운영하기",
+      "sub": "GOMS · Washer",
+      "text": "배포와 SSL 적용, 모니터링을 맡았고, 사용자 문의가 오면 원인을 직접 찾아봤습니다."
+    },
+    {
+      "id": "lead",
+      "published": true,
+      "title": "팀과 맞추기",
+      "sub": "GOMS · Washer · GSMC",
+      "text": "PM과 리더로 6~10명 팀의 일정과 요구사항을 조율하고, 온보딩과 문서화를 챙겼습니다."
     }
   ],
   "openSource": {
-    "checkedAt": "2026-10-14",
-    "activityUrl": "https://github.com/search?q=is%3Apr+author%3Aexijn+is%3Amerged&type=pullrequests",
+    "checkedAt": "2026-11-18",
     "contributions": [
       {
+        "id": "josdk",
+        "published": true,
+        "name": "Java Operator SDK",
+        "repo": "operator-framework/java-operator-sdk",
+        "description": "종속 리소스의 API 버전 변경을 감지하는 옵션 추가",
+        "url": "https://github.com/operator-framework/java-operator-sdk/pull/3536",
+        "number": 3536,
+        "status": "merged"
+      },
+      {
+        "id": "josdk-starter",
+        "published": true,
+        "name": "JOSDK Spring Boot Starter",
+        "repo": "operator-framework/josdk-spring-boot-starter",
+        "description": "종속 리소스를 Spring으로 생성해 Spring 빈을 주입받을 수 있게 변경",
+        "url": "https://github.com/operator-framework/josdk-spring-boot-starter/pull/320",
+        "number": 320,
+        "status": "merged"
+      },
+      {
+        "id": "graphql-java",
+        "published": true,
+        "name": "GraphQL Java",
+        "repo": "graphql-java/graphql-java",
+        "description": "Kotlin에서 nullable 결과 타입을 쓸 수 있도록 DataFetcherResult.newResult()의 제네릭 경계 수정",
+        "url": "https://github.com/graphql-java/graphql-java/pull/4418",
+        "number": 4418,
+        "status": "merged"
+      },
+      {
+        "id": "jackson",
+        "published": true,
+        "name": "Jackson Databind",
+        "repo": "FasterXML/jackson-databind",
+        "description": "BeanSerializerModifier가 기존 프로퍼티 직렬화기를 교체할 수 있도록 변경",
+        "url": "https://github.com/FasterXML/jackson-databind/pull/6173",
+        "number": 6173,
+        "status": "merged"
+      },
+      {
+        "id": "detekt",
+        "published": true,
+        "name": "detekt",
+        "repo": "detekt/detekt",
+        "description": "기여자 가이드의 오래된 분석 스크립트 안내 정리 (문서)",
+        "url": "https://github.com/detekt/detekt/pull/9660",
+        "number": 9660,
+        "status": "merged"
+      },
+      {
+        "id": "gradle",
+        "published": false,
         "name": "Gradle",
-        "category": "DOCUMENTATION",
+        "repo": "gradle/gradle",
         "description": "Worker API의 WorkParameters 지원 타입을 문서화했습니다.",
         "url": "https://github.com/gradle/gradle/pull/38952",
-        "id": "gradle",
         "number": 38952,
-        "status": "merged",
-        "published": true
-      },
-      {
-        "name": "Jackson Databind",
-        "category": "SERIALIZATION",
-        "description": "BeanSerializerModifier에서 프로퍼티 직렬화기를 재정의할 수 있도록 개선했습니다.",
-        "url": "https://github.com/FasterXML/jackson-databind/pull/6173",
-        "id": "jackson",
-        "number": 6173,
-        "status": "merged",
-        "published": true
-      },
-      {
-        "name": "Java Operator SDK",
-        "category": "KUBERNETES",
-        "description": "종속 리소스의 API 버전 변경 감지를 구현하고, Kotlin 상호운용성 테스트에 기여했습니다.",
-        "url": "https://github.com/operator-framework/java-operator-sdk/pull/3536",
-        "id": "josdk",
-        "number": 3536,
-        "status": "merged",
-        "published": true
+        "status": "merged"
       }
     ]
   },
   "activities": [
     {
-      "period": "2026 — 2027",
-      "title": "전교 학생회장",
-      "description": "광주소프트웨어마이스터고등학교 · 학생의 목소리를 듣고 함께 만드는 학교",
       "id": "president",
-      "published": true
+      "published": true,
+      "period": "2026.07 — 2027.07",
+      "title": "전교 학생회장",
+      "description": "광주소프트웨어마이스터고등학교"
     },
     {
-      "period": "IN SCHOOL",
-      "title": "교내 개발 동아리",
-      "description": "함께 개발하고, 실제 교내 서비스를 운영하며 배우는 경험",
       "id": "club",
-      "published": true
+      "published": true,
+      "period": "",
+      "title": "전공 동아리 인력사무소",
+      "description": ""
     },
     {
+      "id": "talk",
+      "published": true,
+      "period": "2026.09",
+      "title": "「내가 회장이 된 방법」 교내 발표",
+      "description": ""
+    },
+    {
+      "id": "festival",
+      "published": false,
       "period": "2025",
       "title": "AI·SW 축전 운영 도우미",
-      "description": "기술을 만나는 현장에서 행사의 원활한 운영 지원",
-      "id": "festival",
-      "published": true
-    },
-    {
-      "period": "TALK",
-      "title": "「내가 회장이 된 방법」",
-      "description": "도전과 그 과정에서 배운 것을 나눈 교내 발표",
-      "id": "talk",
-      "published": true
+      "description": "기술을 만나는 현장에서 행사의 원활한 운영 지원"
     }
   ],
   "skills": [
     {
-      "name": "Main",
-      "items": [
-        "Kotlin",
-        "Java",
-        "Spring Boot",
-        "Spring Security",
-        "JPA"
-      ],
       "id": "main",
-      "published": true
+      "published": true,
+      "name": "Main",
+      "items": ["Kotlin", "Java", "Spring Boot", "Spring Security", "JPA"]
     },
     {
-      "name": "Data",
-      "items": [
-        "MySQL",
-        "MariaDB",
-        "PostgreSQL",
-        "Redis"
-      ],
       "id": "data",
-      "published": true
+      "published": true,
+      "name": "Data",
+      "items": ["MySQL", "MariaDB", "PostgreSQL", "Redis"]
     },
     {
-      "name": "Infrastructure",
-      "items": [
-        "Docker",
-        "Nginx",
-        "GitHub Actions",
-        "Ubuntu"
-      ],
       "id": "infra",
-      "published": true
+      "published": true,
+      "name": "Infrastructure",
+      "items": ["Docker", "Nginx", "GitHub Actions", "Ubuntu"]
     },
     {
-      "name": "Interests",
-      "items": [
-        "Backend",
-        "Service Operation",
-        "DevOps",
-        "Open Source",
-        "PM"
-      ],
       "id": "interests",
-      "published": true
+      "published": true,
+      "name": "Interests",
+      "items": ["Backend", "Service Operation", "DevOps", "Open Source", "PM"]
     }
   ]
 }

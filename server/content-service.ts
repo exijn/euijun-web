@@ -38,7 +38,7 @@ export async function prepare(value: unknown) {
       const image = sharp(bytes, { limitInputPixels: 24000000, animated: false, failOn: 'warning' })
       const meta = await image.metadata()
       if (!['jpeg', 'png', 'webp', 'avif', 'heif'].includes(meta.format ?? '') || (meta.pages ?? 1) > 1) throw new Error('Invalid format')
-      const data = await image.rotate().resize({ width: 1600, height: 1200, fit: 'inside', withoutEnlargement: true }).webp({ quality: 82 }).toBuffer()
+      const data = await image.rotate().resize({ width: 1600, height: 900, fit: 'inside', withoutEnlargement: true }).webp({ quality: 82 }).toBuffer()
       const path = `public/images/projects/uploads/${digest(data)}.webp`
       project.image = path.replace(/^public/, '')
       files.push({ path, data })

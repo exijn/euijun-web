@@ -13,8 +13,9 @@ test('page layout, assets, links and accessibility', async ({ page }, testInfo) 
   await page.goto('/')
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(content.profile.name)
   await expect(page).toHaveTitle(`${content.profile.name} · ${content.profile.role}`)
-  await expect(page.locator('.project-list > article')).toHaveCount(content.projects.length)
-  await expect(page.locator('.project-featured .project-visual')).toHaveCount(content.projects.filter((project) => project.featured && project.image).length)
+  await expect(page.locator('.ptab')).toHaveCount(content.projects.length)
+  await expect(page.locator('.prow')).toHaveCount(content.projects.length + (content.openSource.contributions.length > 0 ? 1 : 0))
+  await expect(page.locator('.shot')).toHaveCount(content.projects[0]?.image ? 1 : 0)
 
   // Scroll normally through the complete page to load deferred images and reveal content.
   const height = await page.evaluate(() => document.documentElement.scrollHeight)
@@ -39,10 +40,8 @@ test('page layout, assets, links and accessibility', async ({ page }, testInfo) 
     }
   })
   expect(layout).toEqual({ overflow: false, outside: [], missingImages: [], brokenAnchors: [], blankLinks: 0, unsafeLinks: 0 })
-  await expect(page.getByRole('link', { name: /LinkedIn/ })).toHaveCount(content.profile.linkedin ? 2 : 0)
   await expect(page.locator('a[href^="tel:"]')).toHaveCount(0)
   await expect(page.locator('a[href*="manage"], a[href*="auth/"], a[href*="private-assets"]')).toHaveCount(0)
-  await expect(page.locator('.hero-visual')).toHaveCount(0)
   expect((await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze()).violations).toEqual([])
   expect(errors).toEqual([])
   await page.screenshot({ path: `docs/screenshots/redesign/${testInfo.project.name}-full.png`, fullPage: true })
@@ -57,7 +56,7 @@ test('keyboard navigation, mobile menu and active section', async ({ page }) => 
   expect(await skip.evaluate((node) => getComputedStyle(node).outlineStyle)).toBe('solid')
   await page.keyboard.press('Enter')
   await expect(page.locator('main')).toBeFocused()
-  const mobile = (page.viewportSize()?.width ?? 1440) < 800
+  const mobile = (page.viewportSize()?.width ?? 1440) < 760
   if (mobile) {
     const toggle = page.getByRole('button', { name: /메뉴 (열기|닫기)/ })
     await toggle.focus()
@@ -68,29 +67,36 @@ test('keyboard navigation, mobile menu and active section', async ({ page }) => 
     await expect(toggle).toHaveAttribute('aria-expanded', 'false')
     await page.keyboard.press('Enter')
   }
-  const work = page.locator('#main-navigation a[href="#work"]')
-  await work.click()
-  await expect(page).toHaveURL(/#work$/)
+  // The desktop nav persists in the DOM (hidden via CSS) even when the mobile panel is open,
+  // so active-section assertions always read it; only the click target differs by viewport.
+  const desktopNav = page.locator('nav[aria-label="주요 섹션"]')
+  const clickTarget = (mobile ? page.locator('#mobile-menu') : desktopNav).locator('a[href="#projects"]')
+  await clickTarget.click()
+  await expect(page).toHaveURL(/#projects$/)
   if (mobile) {
     await expect(page.getByRole('button', { name: '메뉴 열기' })).toHaveAttribute('aria-expanded', 'false')
-    await expect(page.locator('#work')).toBeFocused()
+    await expect(page.locator('#projects')).toBeFocused()
   }
-  await expect(work).toHaveAttribute('aria-current', 'location')
-  const workTop = await page.locator('#work').evaluate((node) => node.getBoundingClientRect().top)
-  expect(workTop).toBeGreaterThanOrEqual(64)
+  await page.evaluate(() => window.dispatchEvent(new Event('scroll')))
+  await expect(desktopNav.locator('a[href="#projects"]')).toHaveAttribute('aria-current', 'location')
+  const projectsTop = await page.locator('#projects').evaluate((node) => node.getBoundingClientRect().top)
+  expect(projectsTop).toBeGreaterThanOrEqual(64)
   await page.locator('#contact').evaluate((node) => node.scrollIntoView({ behavior: 'instant' }))
-  await expect(page.locator('#main-navigation a[href="#contact"]')).toHaveAttribute('aria-current', 'location')
-  await page.getByRole('link', { name: '맨 위로' }).click()
+  await page.evaluate(() => window.dispatchEvent(new Event('scroll')))
+  await expect(desktopNav.locator('a[href="#contact"]')).toHaveAttribute('aria-current', 'location')
+  await page.getByRole('link', { name: '맨 위로 ↑' }).click()
   await expect.poll(() => page.evaluate(() => window.scrollY)).toBeLessThan(100)
 })
 
 test('reduced motion keeps content visible', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' })
   await page.goto('/')
-  await expect(page.locator('.reveal-pending')).toHaveCount(0)
-  expect(await page.locator('.hero-enter').first().evaluate((node) => getComputedStyle(node).animationName)).toBe('none')
+  expect(await page.locator('.enter').first().evaluate((node) => getComputedStyle(node).animationName)).toBe('none')
   expect(await page.locator('html').evaluate((node) => getComputedStyle(node).scrollBehavior)).toBe('auto')
-  for (const section of ['about', 'work', 'open-source', 'activities', 'contact']) {
+  const sections = ['projects', 'about', 'contact']
+  if (content.openSource.contributions.length) sections.push('oss')
+  if (content.activities.length) sections.push('activity')
+  for (const section of sections) {
     const target = page.locator(`#${section}`)
     await target.scrollIntoViewIfNeeded()
     await expect(target).toBeVisible()

@@ -20,7 +20,7 @@ test('private editor: keyboard, validation, CRUD, ordering, preview, review and 
   await page.getByRole('button', { name: '변경 내용 검토', exact: true }).click()
   await expect(page.getByRole('alert')).toContainText('필수 항목')
   await page.getByLabel('이름', { exact: true }).fill('한의준')
-  await page.getByLabel('핵심 문구').fill('테스트 소개 ' + testInfo.project.name)
+  await page.getByLabel('첫 소개 문장').fill('테스트 소개 ' + testInfo.project.name)
   await page.getByRole('button', { name: '프로젝트', exact: true }).click()
   await page.getByRole('button', { name: '+ 프로젝트 추가', exact: true }).click()
   const fourth = page.locator('.editor-item').nth(3)
@@ -39,9 +39,8 @@ test('private editor: keyboard, validation, CRUD, ordering, preview, review and 
   if (testInfo.project.name === '375px') {
     const first = page.locator('.editor-item').first()
     await first.getByLabel('이미지 설명 (alt)', { exact: true }).fill('업로드 검증용 이미지')
-    await first.getByLabel('이미지 캡션', { exact: true }).fill('실제 업로드 흐름 테스트')
     const buffer = await sharp({ create: { width: 8, height: 8, channels: 3, background: '#bbbbbb' } }).png().toBuffer()
-    await first.getByLabel('프로젝트 이미지 업로드', { exact: true }).setInputFiles({ name: 'test.png', mimeType: 'image/png', buffer })
+    await first.getByLabel('프로젝트 16:9 이미지 업로드', { exact: true }).setInputFiles({ name: 'test.png', mimeType: 'image/png', buffer })
     await expect(first).toContainText('새 이미지 선택됨')
   }
   await page.getByRole('button', { name: '변경 미리보기', exact: true }).click()
