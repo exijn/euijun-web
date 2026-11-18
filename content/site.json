@@ -10,7 +10,7 @@
     "schoolShort": "광주소프트웨어마이스터고",
     "email": "hanej090224@gmail.com",
     "github": "https://github.com/exijn",
-    "linkedin": "",
+    "linkedin": "https://www.linkedin.com/in/uijun-han",
     "website": "https://exijn.com",
     "domain": "exijn.com",
     "contactText": "프로젝트나 오픈소스 이야기라면 편하게 연락 주세요."
@@ -23,7 +23,7 @@
       "headline": "교내 외출 관리 서비스",
       "team": "약 8명",
       "role": "백엔드 파트리더 → 전체 PM",
-      "status": "",
+      "status": "교내 운영",
       "color": "#e3b183",
       "technologies": ["Kotlin", "Spring Boot", "MariaDB", "Redis"],
       "work": [
@@ -44,7 +44,7 @@
       "headline": "기숙사 세탁기·건조기 서비스",
       "team": "약 6명",
       "role": "전체 리더 · 백엔드 파트리더",
-      "status": "",
+      "status": "교내 운영",
       "color": "#9cc3e6",
       "technologies": ["Java", "Spring Boot", "MySQL", "Redis"],
       "work": [
@@ -64,7 +64,7 @@
       "headline": "교내 역량 인증 관련 서비스",
       "team": "약 10명",
       "role": "통합 리더",
-      "status": "",
+      "status": "개발 중 · 운영 예정",
       "color": "#c0b0e3",
       "technologies": ["Kotlin", "Spring Boot", "GraphQL", "JPA"],
       "work": [
@@ -171,30 +171,30 @@
     {
       "id": "president",
       "published": true,
-      "period": "2026 — 2027",
+      "period": "2026.07 — 2027.07",
       "title": "전교 학생회장",
-      "description": "광주소프트웨어마이스터고등학교 · 학생의 목소리를 듣고 함께 만드는 학교"
+      "description": "광주소프트웨어마이스터고등학교"
     },
     {
       "id": "club",
       "published": true,
-      "period": "IN SCHOOL",
-      "title": "교내 개발 동아리",
-      "description": "함께 개발하고, 실제 교내 서비스를 운영하며 배우는 경험"
-    },
-    {
-      "id": "festival",
-      "published": true,
-      "period": "2025",
-      "title": "AI·SW 축전 운영 도우미",
-      "description": "기술을 만나는 현장에서 행사의 원활한 운영 지원"
+      "period": "",
+      "title": "전공 동아리 인력사무소",
+      "description": ""
     },
     {
       "id": "talk",
       "published": true,
-      "period": "TALK",
-      "title": "「내가 회장이 된 방법」",
-      "description": "도전과 그 과정에서 배운 것을 나눈 교내 발표"
+      "period": "2026.09",
+      "title": "「내가 회장이 된 방법」 교내 발표",
+      "description": ""
+    },
+    {
+      "id": "festival",
+      "published": false,
+      "period": "2025",
+      "title": "AI·SW 축전 운영 도우미",
+      "description": "기술을 만나는 현장에서 행사의 원활한 운영 지원"
     }
   ],
   "skills": [
