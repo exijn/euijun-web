@@ -17,7 +17,7 @@ function fixture() {
 }
 
 test('metadata escapes edited content, preserves dollar strings, removes empty contact links', () => {
-  const profile = { ...initialContent.profile, name: '<script>$&</script>', tagline: '$1 & "소개"', email: '', github: '', linkedin: '' }
+  const profile = { ...initialContent.profile, name: '<script>$&</script>', tagline: '$1 & "소개"', email: '', github: '' }
   const html = renderMetadata(readFileSync('index.html', 'utf8'), profile)
   assert.ok(html.includes('&lt;script&gt;$&amp;&lt;/script&gt;'))
   assert.ok(html.includes('$1 &amp; &quot;소개&quot;'))

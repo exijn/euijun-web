@@ -1,4 +1,4 @@
-# exijn.kr · 한의준
+# exijn.com · 한의준
 
 React + TypeScript + Vite 개인 홈페이지입니다. 중성 회색, 짧은 소개, 프로젝트 중심의 단일 페이지와 서버 인증을 거치는 별도 콘텐츠 편집기로 구성됩니다.
 
@@ -27,28 +27,29 @@ npm start
 | 수정할 내용 | 위치 |
 | --- | --- |
 | 이름·직무·소개·학교 | `profile` |
-| GitHub·이메일·LinkedIn·도메인 | `profile.github / email / linkedin / website / domain` |
+| GitHub·LinkedIn·이메일·도메인 | `profile.github / linkedin / email / website / domain` |
 | 프로젝트 | `projects` 배열 |
+| 해 온 일 | `ways` 배열 |
 | 오픈소스 | `openSource.contributions` 배열 |
 | 활동 | `activities` 배열 |
-| 기술 분류 | `skills` 배열 |
+| 기술 분류 (공개 화면에는 표시되지 않음) | `skills` 배열 |
 
 - 배열의 항목을 추가·삭제·이동하면 목록이 바뀝니다. `id`는 같은 목록에서 중복되지 않는 영문 소문자·숫자·하이픈입니다.
-- `published: false`는 공개 빌드에서 항목을 제외합니다. Git 기록이나 이미지 파일 자체를 비밀로 만드는 기능은 아닙니다.
-- 대표 프로젝트는 `featured: true` 하나만 설정합니다. 나머지는 배열 순서로 표시합니다.
-- 빈 GitHub·이메일·LinkedIn은 버튼을 표시하지 않습니다. 전화번호 필드는 없습니다.
-- 오픈소스는 공개 항목 중 앞의 3개만 표시합니다. `reverted`는 자동 제외됩니다. PR URL과 번호가 일치해야 합니다.
-- 상세 설명·분류는 향후 상세 페이지용으로 보존하며 홈페이지에는 문제·역할·결과를 간결하게 표시합니다.
-- 색상·폰트는 `src/tokens.css`, 간격·레이아웃은 `src/styles.css`를 수정합니다.
+- `published: false`는 공개 빌드에서 항목을 제외합니다. Git 기록이나 이미지 파일 자체를 비밀로 만드는 기능은 아닙니다. 아직 확인하지 못한 프로젝트 상태나 오픈소스 기여는 `published: false`로 두거나 `status`를 빈 문자열로 둡니다.
+- 프로젝트 순서가 그대로 첫 화면 보드와 탭 순서로 표시됩니다.
+- 빈 GitHub·LinkedIn·이메일은 버튼을 표시하지 않습니다. 전화번호 필드는 없습니다.
+- 오픈소스는 공개(`published: true`)이고 `reverted`가 아닌 전체 항목을 표시합니다. PR URL과 번호가 일치해야 합니다.
+- 프로젝트의 `color`는 `#rrggbb` 형식이며 프로젝트 탭·보드의 식별 점 색상입니다.
+- 색상 변수는 `src/styles.css`의 `.site` 블록 상단(`--brand-1`, `--brand-2`, `--on-brand` 등)에서, 간격·레이아웃도 같은 파일에서 수정합니다.
 - title·description·canonical·OG 텍스트·Person·noscript·robots·sitemap은 빌드 시 프로필에서 생성됩니다. 도메인 변경 시 `website`와 `domain`을 함께 변경하세요.
 
 ## 이미지 교체
 
 실제 화면이 확인되지 않은 프로젝트에는 이미지 영역을 표시하지 않습니다. 검증된 이미지를 추가하면 프로젝트에 표시됩니다.
 
-- 권장: **4:3**, 960×720 또는 1600×1200, 가능하면 200 KB 안팎의 WebP/AVIF. 표시 영역은 4:3으로 크롭되므로 중요한 부분은 중앙에 두세요.
-- 직접 수정: `public/images/projects/goms/cover.webp` 등에 파일을 추가하고 해당 프로젝트의 `image`를 `/images/projects/goms/cover.webp`로 설정합니다. `imageAlt`는 필수, `imageCaption`은 선택입니다. GSMC·Washer도 같은 방식입니다.
-- 웹 편집: 프로젝트의 이미지 업로드에서 선택하고 alt를 입력합니다. 서버가 검증·메타데이터 제거·최대 1600×1200 WebP 변환 후 `public/images/projects/uploads/<hash>.webp`에 저장합니다.
+- 권장: **16:9**, 1600×900, 가능하면 200 KB 안팎의 WebP/AVIF. 표시 영역은 16:9 틀에 `object-fit: contain`으로 맞추므로 다른 비율의 이미지도 잘리지 않고 여백과 함께 표시됩니다.
+- 직접 수정: `public/images/projects/goms/cover.webp` 등에 파일을 추가하고 해당 프로젝트의 `image`를 `/images/projects/goms/cover.webp`로 설정합니다. `imageAlt`는 필수입니다. GSMC·Washer도 같은 방식입니다.
+- 웹 편집: 프로젝트의 이미지 업로드에서 선택하고 alt를 입력합니다. 서버가 검증·메타데이터 제거 후 최대 1600×900 안에서 비율을 유지해 WebP로 변환하고 `public/images/projects/uploads/<hash>.webp`에 저장합니다.
 - 정적 PNG/JPEG/WebP/AVIF만 허용합니다. 각 2 MB, 한 번에 최대 3개, 전체 JSON 요청 4 MB 제한입니다. SVG·움직이는 이미지·24 MP 초과 이미지는 거절됩니다.
 - 이미지를 지우려면 선택 중인 업로드를 취소하고 이미지 경로를 비웁니다. 기존 Git 파일은 자동 삭제하지 않아 복구할 수 있습니다.
 - 공유 이미지: `public/images/og.svg`를 수정하고 아래 명령으로 `og.png`를 다시 만드세요. OG 이미지의 문자 자체는 자동 갱신되지 않습니다. favicon은 `public/favicon.svg`입니다.
