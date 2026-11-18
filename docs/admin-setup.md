@@ -12,7 +12,7 @@
 
 | 이름 | 설정 내용 |
 | --- | --- |
-| APP_ORIGIN | 실제 HTTPS origin. 경로·쿼리 없이 `https://exijn.kr` 형태 |
+| APP_ORIGIN | 실제 HTTPS origin. 경로·쿼리 없이 `https://exijn.com` 형태 |
 | GITHUB_CLIENT_ID | 직접 만든 GitHub OAuth App의 Client ID |
 | GITHUB_CLIENT_SECRET | 해당 OAuth App의 Client secret |
 | GITHUB_OWNER_ID | `gh api users/exijn --jq .id`로 확인한 숫자 ID |
@@ -20,6 +20,7 @@
 | GITHUB_CONTENT_TOKEN | 해당 저장소만 선택한 fine-grained PAT |
 | SESSION_SECRET | 암호학적 난수 32바이트의 base64 |
 | PORT / HOST | 독립 Node 서버만 선택 설정. 기본 4174 / 127.0.0.1 |
+| BLOB_READ_WRITE_TOKEN | 선택. Vercel Blob 스토어의 읽기·쓰기 토큰. 비우면 포트폴리오 PDF 업로드만 "스토리지 미설정"으로 비활성화되고 나머지 편집 기능은 그대로 동작합니다 |
 
 PowerShell에서 키를 **본인 터미널에서만** 생성한 후 안전하게 보관합니다. 결과를 채팅·로그·커밋에 넣지 마세요.
 
@@ -56,6 +57,14 @@ console.log(randomBytes(32).toString('base64'))
 9. 실제 배포 후 비로그인으로 관리 API와 private-assets가 404인지, `dist`에만 정적 접근이 가능한지 확인합니다.
 
 관리 경로는 공개 sitemap·robots·navigation에 나열하지 않습니다. 해당 경로에만 noindex 헤더를 적용하므로 robots 파일로 경로를 공개하지 않습니다. Vercel 설정 파일은 준비했지만 실제 플랫폼 빌드·OAuth 왕복·DNS는 아직 검증하지 않았습니다.
+
+## Vercel Blob (선택, 포트폴리오 PDF 업로드용)
+
+1. Vercel 프로젝트의 Storage 탭에서 **Blob** 스토어를 하나 만들고 이 프로젝트에 연결합니다.
+2. 연결하면 Vercel이 `BLOB_READ_WRITE_TOKEN`을 프로젝트 환경 변수에 자동으로 추가합니다. 로컬 개발용으로는 `.env`에 같은 값을 복사하거나(실 서비스 토큰을 로컬에 두는 것이 꺼려지면) 별도 개발용 스토어를 만들어 사용하세요.
+3. 설정하지 않으면 편집기에서 포트폴리오 PDF 업로드 버튼이 "스토리지 미설정" 안내로 바뀌고, 다른 편집 기능은 그대로 동작합니다.
+4. 편집기는 PDF를 서버를 거치지 않고 브라우저에서 Blob 스토어로 직접 올립니다(client upload). 서버는 업로드 토큰 발급 전 세션·CSRF·Origin을 검사하고, `portfolio/` 경로의 `.pdf`·20 MB 이하로만 제한합니다. 저장(PR 생성) 시점에 서버가 해당 URL이 이 스토어 호스트인지와 파일이 실제 PDF(`%PDF-`로 시작)인지 다시 확인한 뒤에만 `content/site.json`에 반영합니다.
+5. 업로드된 파일은 업로드 즉시 추측하기 어려운 공개 URL로 접근할 수 있게 됩니다. `content/site.json`에 반영되는 것은 PR이 병합된 뒤입니다. 예전에 올린 PDF는 자동으로 삭제되지 않으므로, 삭제가 필요하면 Vercel 대시보드에서 직접 지우세요.
 
 ## 독립 Node 서버
 
@@ -99,7 +108,8 @@ console.log(randomBytes(32).toString('base64'))
 - 요청 제한은 **프로세스/함수 인스턴스별**입니다: 인증 시작/콜백 각 10회/분, 세션당 120회/분, 수정 12회/분. 분산 서버리스 전체의 제한은 플랫폼 WAF의 IP별 인증/쓰기 rate limit으로 보완해야 합니다. 사용자 헤더에서 임의 IP를 신뢰하지 않습니다.
 - 무상태 세션이므로 로그아웃은 해당 브라우저 쿠키를 지웁니다. 이미 탈취된 쿠키를 개별 취소하는 중앙 저장소는 없습니다. 의심 시 SESSION_SECRET을 교체해 전 세션을 무효화하고 PAT/OAuth secret도 필요에 따라 폐기하세요.
 - 공개 여부는 콘텐츠 노출 제어입니다. 저장소 기록·public 이미지 자체의 접근 통제가 아니므로 개인정보·비밀 문서를 업로드하지 마세요.
-- 이미지 포맷·magic bytes·해상도를 검사하고 WebP 재인코딩합니다. HTML/SVG/스크립트 파일을 업로드할 수 없습니다.
+- 이미지 포맷·magic bytes·해상도를 검사하고 WebP 재인코딩합니다. HTML/SVG/스크립트 파일을 업로드할 수 없습니다. 증명사진·프로젝트 대표 목업·화면 캡처 모두 같은 검증을 거치며 용도별 최대 치수만 다릅니다(사진 800×800, 목업 1600×900, 캡처 긴 변 1600, 모두 비율 유지·자르지 않음).
+- 포트폴리오 PDF 업로드 토큰 발급(`/api/manage/blob-upload`)도 다른 쓰기 API와 같은 세션·CSRF·Origin·요청 제한을 적용하며, `application/pdf`·`portfolio/` 경로·20 MB 이하로만 토큰을 내줍니다. 저장 시 서버가 URL 호스트와 PDF 매직바이트를 다시 확인합니다.
 - 저장된 일반 텍스트는 React가 escape합니다. 링크는 HTTPS, 이미지 경로는 허용된 프로젝트 raster 경로만 받습니다.
 - `tests/fixture-server.ts`는 로컬 합성 테스트 서버입니다. 운영 진입점은 `server/index.ts` 또는 `api/index.ts`뿐입니다. fixture 서버를 배포하지 마세요.
 - 릴리스 전 토큰 최소 권한, GitHub branch protection, 플랫폼 WAF, CDN 캐시, 실제 계정 거부, 토큰 만료·갱신, 복구 절차를 확인하세요.

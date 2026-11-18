@@ -4,15 +4,21 @@ import { fixtureContent } from './content.ts'
 
 // 테스트 전용 합성 자격값. 운영 코드에는 이 fixture나 인증 우회 경로가 없습니다.
 export const testConfig: Config = { origin: 'http://localhost:4175', clientId: 'fixture-client', clientSecret: 'fixture-oauth-secret', ownerId: 218341304, repository: 'exijn/fixture-repo', contentToken: 'fixture-repo-token', secret: Buffer.alloc(32, 7) }
+// generateClientTokenFromReadWriteToken only signs locally (HMAC over the token), so a fixture-shaped
+// fake token exercises the real @vercel/blob client-token code path without any network or real store.
+export const testBlobToken = 'vercel_blob_rw_fixturestoreid1234_fixturesecretvalue1234567890'
+export const testBlobHost = 'fixturestoreid1234.public.blob.vercel-storage.com'
 export const initialContent = fixtureContent
 export function mockGitHub() {
   const state = {
     head: 'a'.repeat(40), headReads: 0, advanceAt: 0, failPath: '', identity: { id: testConfig.ownerId, login: 'exijn' },
     calls: [] as { method: string; path: string; body: Record<string, unknown> }[],
-    refs: new Map<string, string>(), content: structuredClone(initialContent), merged: false, deployment: '',
+    refs: new Map<string, string>(), content: structuredClone(initialContent), merged: false, deployment: '', portfolioPdfValid: true,
   }
   const fetcher: Fetcher = async (input, init) => {
-    const url = new URL(String(input)); const path = url.pathname.replace('/repos/' + testConfig.repository, '') + url.search
+    const url = new URL(String(input))
+    if (url.hostname === testBlobHost) return new Response(new Uint8Array(Buffer.from(state.portfolioPdfValid ? '%PDF-1.7 fixture' : 'not a pdf')), { status: 200 })
+    const path = url.pathname.replace('/repos/' + testConfig.repository, '') + url.search
     const method = init?.method ?? 'GET'; const body = init?.body ? JSON.parse(String(init.body)) as Record<string, unknown> : {}
     state.calls.push({ method, path, body })
     const json = (data: unknown, status = 200) => new Response(JSON.stringify(data), { status, headers: { 'Content-Type': 'application/json' } })

@@ -3,6 +3,7 @@ import type { SiteContent, Project } from '../shared/content'
 import { Header } from './components/Header'
 import { ExternalLink } from './components/ExternalLink'
 import { Icon } from './components/Icon'
+import { Lightbox } from './components/Lightbox'
 
 const STATUS_LABEL: Record<string, string> = { merged: '병합됨', open: '검토 중', closed: '닫힘', reverted: '되돌려짐' }
 
@@ -14,12 +15,16 @@ export function Site({ content, preview = false }: { content: SiteContent; previ
   const activities = content.activities.filter((item) => item.published)
   const hasOss = oss.length > 0
   const hasActivities = activities.length > 0
+  const hasPortfolio = Boolean(profile.portfolio.url)
 
   const [selected, setSelected] = useState(projects[0]?.id)
   const currentIndex = Math.max(0, projects.findIndex((project) => project.id === selected))
   const current: Project | undefined = projects[currentIndex]
   const next = projects.length > 1 ? projects[(currentIndex + 1) % projects.length] : undefined
-  const select = (id: string) => setSelected(id)
+  const select = (id: string) => { setSelected(id); setLightbox(null) }
+  const shots = current?.screenshots.filter((shot) => shot.published && shot.image) ?? []
+  const docs = current?.documents.filter((doc) => doc.published) ?? []
+  const [lightbox, setLightbox] = useState<number | null>(null)
 
   const initials = profile.name.slice(-2)
   const links = [
@@ -27,6 +32,7 @@ export function Site({ content, preview = false }: { content: SiteContent; previ
     { label: '웹사이트', href: profile.website, text: profile.domain, external: false },
     profile.email ? { label: '이메일', href: 'mailto:' + profile.email, text: profile.email, external: false } : null,
     profile.linkedin ? { label: 'LinkedIn', href: profile.linkedin, text: profile.linkedin.replace(/^https:\/\//, '').replace(/\/$/, ''), external: true } : null,
+    hasPortfolio ? { label: '포트폴리오 PDF', href: profile.portfolio.url, text: profile.portfolio.label, external: true } : null,
   ].filter((item): item is { label: string; href: string; text: string; external: boolean } => item !== null)
 
   return <div className="site">
@@ -43,6 +49,7 @@ export function Site({ content, preview = false }: { content: SiteContent; previ
             <div className="ctas enter d3">
               <a className="btn primary" href="#projects">프로젝트 보기<Icon name="down" /></a>
               {profile.github && <ExternalLink href={profile.github} className="btn">GitHub<Icon name="external" /></ExternalLink>}
+              {hasPortfolio && <ExternalLink href={profile.portfolio.url} className="btn">포트폴리오 PDF<Icon name="down" /></ExternalLink>}
             </div>
           </div>
           <nav className="board enter d3" aria-labelledby="board-title">
@@ -79,6 +86,15 @@ export function Site({ content, preview = false }: { content: SiteContent; previ
                 {current.status && <span className="status"><i aria-hidden="true" />{current.status}</span>}
               </div>
               {current.image && <figure className="shot"><img src={current.image} alt={current.imageAlt} loading="lazy" width="1600" height="900" /></figure>}
+              {shots.length > 0 && <>
+                <h4 className="pd-h">화면</h4>
+                <div className="shots" role="list">{shots.map((shot, index) => (
+                  <button type="button" key={shot.id} role="listitem" className="shot-thumb" onClick={() => setLightbox(index)} aria-label={`${shot.alt} 크게 보기 (${index + 1}/${shots.length})`}>
+                    <img src={shot.image} alt="" loading="lazy" width="300" height="300" />
+                  </button>
+                ))}</div>
+                <Lightbox items={shots.map((shot) => ({ image: shot.image, alt: shot.alt, caption: shot.caption }))} index={lightbox} onClose={() => setLightbox(null)} onNavigate={setLightbox} />
+              </>}
               <dl className="facts">
                 <div><dt>팀</dt><dd>{current.team || '—'}</dd></div>
                 <div><dt>내 역할</dt><dd>{current.role}</dd></div>
@@ -86,6 +102,14 @@ export function Site({ content, preview = false }: { content: SiteContent; previ
               </dl>
               <h4 className="pd-h">맡은 일</h4>
               <ul className="work">{current.work.map((item, index) => <li key={index}>{item}</li>)}</ul>
+              {docs.length > 0 && <>
+                <h4 className="pd-h">문서</h4>
+                <ul className="docs">{docs.map((doc) => {
+                  let domain = doc.url
+                  try { domain = new URL(doc.url).hostname } catch { /* keep raw url if unparsable */ }
+                  return <li key={doc.id}><a className="doc-link" href={doc.url} target="_blank" rel="noopener noreferrer"><Icon name="doc" /><b>{doc.label}</b><em>{domain}</em><Icon name="external" /></a></li>
+                })}</ul>
+              </>}
               {current.note && <p className="note">{current.note}</p>}
               <div className="pd-foot">
                 <div className="pd-links">{current.github && <ExternalLink href={current.github} className="btn sm">GitHub 저장소<Icon name="external" /></ExternalLink>}</div>
@@ -136,7 +160,7 @@ export function Site({ content, preview = false }: { content: SiteContent; previ
         <div className="wrap">
           <div className="sec-hd"><h2 id="contact-title">연락</h2></div>
           <div className="card">
-            <div className="avatar" aria-hidden="true">{initials}</div>
+            {profile.photo.image ? <img className="avatar" src={profile.photo.image} alt={profile.photo.alt} width="80" height="80" loading="lazy" /> : <div className="avatar" aria-hidden="true">{initials}</div>}
             <div>
               <h3>{profile.name}</h3>
               <p className="who">{profile.role} · {profile.schoolShort}</p>

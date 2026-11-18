@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "profile": {
     "name": "한의준",
     "englishName": "EUIJUN HAN",
@@ -13,7 +13,9 @@
     "linkedin": "https://www.linkedin.com/in/uijun-han",
     "website": "https://exijn.com",
     "domain": "exijn.com",
-    "contactText": "프로젝트나 오픈소스 이야기라면 편하게 연락 주세요."
+    "contactText": "프로젝트나 오픈소스 이야기라면 편하게 연락 주세요.",
+    "photo": { "image": "", "alt": "" },
+    "portfolio": { "label": "", "url": "", "updatedAt": "" }
   },
   "projects": [
     {
@@ -35,7 +37,9 @@
       "note": "기능 구현에서 끝나지 않고, 학생들이 실제로 쓰는 흐름과 운영 중 생기는 문제까지 맡았습니다.",
       "image": "",
       "imageAlt": "",
-      "github": "https://github.com/team-haribo/GOMS-Backend-V3"
+      "github": "https://github.com/team-haribo/GOMS-Backend-V3",
+      "screenshots": [],
+      "documents": []
     },
     {
       "id": "washer",
@@ -55,7 +59,9 @@
       "note": "",
       "image": "",
       "imageAlt": "",
-      "github": "https://github.com/team-washer/Washer-Backend-v2"
+      "github": "https://github.com/team-washer/Washer-Backend-v2",
+      "screenshots": [],
+      "documents": []
     },
     {
       "id": "gsmc",
@@ -76,7 +82,9 @@
       "note": "",
       "image": "",
       "imageAlt": "",
-      "github": "https://github.com/team-incube/GSMC-Server-V4"
+      "github": "https://github.com/team-incube/GSMC-Server-V4",
+      "screenshots": [],
+      "documents": []
     }
   ],
   "ways": [

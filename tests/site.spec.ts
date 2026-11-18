@@ -16,6 +16,12 @@ test('page layout, assets, links and accessibility', async ({ page }, testInfo) 
   await expect(page.locator('.ptab')).toHaveCount(content.projects.length)
   await expect(page.locator('.prow')).toHaveCount(content.projects.length + (content.openSource.contributions.length > 0 ? 1 : 0))
   await expect(page.locator('.shot')).toHaveCount(content.projects[0]?.image ? 1 : 0)
+  // Media fields are all unset in the current production content, so their regions must not render at all.
+  await expect(page.locator('.card img.avatar')).toHaveCount(content.profile.photo.image ? 1 : 0)
+  await expect(page.locator('.card .avatar:not(img)')).toHaveCount(content.profile.photo.image ? 0 : 1)
+  await expect(page.getByRole('link', { name: /포트폴리오 PDF/ })).toHaveCount(content.profile.portfolio.url ? 2 : 0)
+  await expect(page.locator('.shots')).toHaveCount((content.projects[0]?.screenshots.length ?? 0) > 0 ? 1 : 0)
+  await expect(page.locator('.docs')).toHaveCount((content.projects[0]?.documents.length ?? 0) > 0 ? 1 : 0)
 
   // Scroll normally through the complete page to load deferred images and reveal content.
   const height = await page.evaluate(() => document.documentElement.scrollHeight)

@@ -21,3 +21,10 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config | null 
   if (!Number.isSafeInteger(ownerId) || ownerId <= 0) throw new Error('Invalid owner ID')
   return { origin: origin.origin, clientId: env.GITHUB_CLIENT_ID!, clientSecret: env.GITHUB_CLIENT_SECRET!, ownerId, repository: env.GITHUB_REPOSITORY!, contentToken: env.GITHUB_CONTENT_TOKEN!, secret }
 }
+
+// Optional and independent of the core config above: the editor and its other features must keep
+// working when this is unset, only the portfolio PDF upload button is disabled.
+export function loadBlobToken(env: NodeJS.ProcessEnv = process.env): string | null {
+  const token = env.BLOB_READ_WRITE_TOKEN?.trim()
+  return token ? token : null
+}

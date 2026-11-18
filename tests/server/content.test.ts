@@ -6,14 +6,15 @@ import { contentSchema, publicContent } from '../../shared/content.ts'
 import { renderMetadata } from '../../shared/metadata.ts'
 import { ContentService, prepare } from '../../server/content-service.ts'
 import { GitHub } from '../../server/github.ts'
-import { initialContent, mockGitHub, testConfig } from '../fixtures/github.ts'
+import { initialContent, mockGitHub, testConfig, testBlobToken, testBlobHost } from '../fixtures/github.ts'
 
+type DraftUpload = { kind: string; projectId?: string; screenshotId?: string; data: string }
 function fixture() {
   const mock = mockGitHub()
   const github = new GitHub(testConfig, mock.fetcher)
-  const service = new ContentService(github, testConfig)
+  const service = new ContentService(github, testConfig, testBlobToken, mock.fetcher)
   const content = structuredClone(initialContent); content.profile.tagline = '수정한 소개 문구'
-  return { ...mock, github, service, draft: { baseSha: mock.state.head, content, uploads: [] as { projectId: string; data: string }[] } }
+  return { ...mock, github, service, draft: { baseSha: mock.state.head, content, uploads: [] as DraftUpload[] } }
 }
 
 test('metadata escapes edited content, preserves dollar strings, removes empty contact links', () => {
@@ -46,6 +47,28 @@ test('runtime schema rejects scripts in links, unknown fields, traversal, duplic
   content.projects.push(content.projects[0]); assert.equal(contentSchema.safeParse(content).success, false)
   assert.equal(contentSchema.safeParse({ ...initialContent, token: 'secret' }).success, false)
   assert.equal(contentSchema.safeParse({ ...initialContent, profile: { ...initialContent.profile, website: 'not-a-url' } }).success, false)
+})
+test('screenshots cap at 4, require alt, reject http documents and non-blob portfolio URLs', () => {
+  const content = structuredClone(initialContent)
+  const shot = { id: 'shot-1', published: true, image: '', alt: '화면', caption: '' }
+  content.projects[0].screenshots = [shot, shot, shot, shot]
+  assert.equal(contentSchema.safeParse(content).success, false, 'duplicate ids among 4 should fail first')
+  content.projects[0].screenshots = [0, 1, 2, 3].map((i) => ({ ...shot, id: `shot-${i}` }))
+  assert.equal(contentSchema.safeParse(content).success, true)
+  content.projects[0].screenshots.push({ ...shot, id: 'shot-5' })
+  assert.equal(contentSchema.safeParse(content).success, false, 'a 5th screenshot should be rejected')
+  content.projects[0].screenshots = [{ ...shot, alt: '' }]
+  assert.equal(contentSchema.safeParse(content).success, false, 'empty alt should be rejected')
+  content.projects[0].screenshots = []
+  content.projects[0].documents = [{ id: 'doc-1', published: true, label: '문서', url: 'http://example.com/doc' }]
+  assert.equal(contentSchema.safeParse(content).success, false, 'http document URL should be rejected')
+  content.projects[0].documents = [{ id: 'doc-1', published: true, label: '문서', url: 'https://example.com/doc' }]
+  assert.equal(contentSchema.safeParse(content).success, true)
+  content.projects[0].documents = []
+  content.profile.portfolio = { label: '포트폴리오', url: 'https://example.com/not-a-blob-host.pdf', updatedAt: '2026-01-01' }
+  assert.equal(contentSchema.safeParse(content).success, false, 'a non-blob-host portfolio URL should be rejected')
+  content.profile.portfolio = { label: '포트폴리오', url: 'https://mystore.public.blob.vercel-storage.com/portfolio/file.pdf', updatedAt: '2026-01-01' }
+  assert.equal(contentSchema.safeParse(content).success, true)
 })
 test('unpublished and reverted data is removed before public bundling', () => {
   const content = structuredClone(initialContent)
@@ -102,11 +125,11 @@ test('PR failure leaves an explicit recoverable branch error; duplicate saves do
   assert.equal(state.calls.some((call) => call.method === 'PATCH'), false)
 })
 test('image upload checks file content, reencodes WebP and puts content+image in same commit', async () => {
-  const { draft, service, state } = fixture()
+  const { draft, service, state, fetcher } = fixture()
   draft.content.projects[0].imageAlt = '테스트 프로젝트 화면'
   const png = await sharp({ create: { width: 8, height: 8, channels: 3, background: '#bbbbbb' } }).png().toBuffer()
-  draft.uploads = [{ projectId: draft.content.projects[0].id, data: png.toString('base64') }]
-  const prepared = await prepare(draft)
+  draft.uploads = [{ kind: 'projectImage', projectId: draft.content.projects[0].id, data: png.toString('base64') }]
+  const prepared = await prepare(draft, testBlobToken, fetcher)
   assert.match(prepared.content.projects[0].image, /^\/images\/projects\/uploads\/[a-f0-9]{64}\.webp$/)
   assert.equal((await sharp(prepared.files[0].data).metadata()).format, 'webp')
   const review = await service.review(draft)
@@ -115,6 +138,54 @@ test('image upload checks file content, reencodes WebP and puts content+image in
   assert.equal(tree.length, 2)
   draft.uploads[0].data = Buffer.from('<svg onload="alert(1)"></svg>').toString('base64')
   await assert.rejects(prepare(draft), /이미지 형식/)
+})
+test('profile photo and project screenshot uploads resize to their own bounds and land at the right content path', async () => {
+  const { draft } = fixture()
+  draft.content.profile.photo.alt = '프로필 사진'
+  const landscapeShot = { id: 'shot-1', published: true, image: '', alt: '화면 1', caption: '' }
+  draft.content.projects[0].screenshots = [landscapeShot]
+  const photoPng = await sharp({ create: { width: 2000, height: 1000, channels: 3, background: '#aabbcc' } }).png().toBuffer()
+  const shotPng = await sharp({ create: { width: 800, height: 2400, channels: 3, background: '#112233' } }).png().toBuffer()
+  draft.uploads = [
+    { kind: 'profilePhoto', data: photoPng.toString('base64') },
+    { kind: 'projectScreenshot', projectId: draft.content.projects[0].id, screenshotId: 'shot-1', data: shotPng.toString('base64') },
+  ]
+  const prepared = await prepare(draft)
+  assert.match(prepared.content.profile.photo.image, /^\/images\/profile\/uploads\/[a-f0-9]{64}\.webp$/)
+  const photoMeta = await sharp(prepared.files.find((f) => f.path.includes('/profile/'))!.data).metadata()
+  assert.ok(photoMeta.width! <= 800 && photoMeta.height! <= 800)
+  assert.match(prepared.content.projects[0].screenshots[0].image, /^\/images\/projects\/uploads\/[a-f0-9]{64}\.webp$/)
+  const shotMeta = await sharp(prepared.files.find((f) => f.path.includes('/projects/'))!.data).metadata()
+  // Portrait capture: the long edge (height) must be capped at 1600 while aspect ratio is preserved.
+  assert.ok(shotMeta.height! <= 1600 && shotMeta.width! < shotMeta.height!)
+})
+test('uploads targeting the same screenshot or project twice in one save are rejected', async () => {
+  const { draft } = fixture()
+  draft.content.projects[0].screenshots = [{ id: 'shot-1', published: true, image: '', alt: 'a', caption: '' }]
+  const png = await sharp({ create: { width: 8, height: 8, channels: 3, background: '#fff' } }).png().toBuffer()
+  const data = png.toString('base64')
+  draft.uploads = [
+    { kind: 'projectScreenshot', projectId: draft.content.projects[0].id, screenshotId: 'shot-1', data },
+    { kind: 'projectScreenshot', projectId: draft.content.projects[0].id, screenshotId: 'shot-1', data },
+  ]
+  await assert.rejects(prepare(draft), /중복/)
+})
+test('portfolio URL is verified against the configured blob store before it is accepted', async () => {
+  const { draft, service, state } = fixture()
+  draft.content.profile.portfolio = { label: '포트폴리오', url: `https://${testBlobHost}/portfolio/portfolio.pdf`, updatedAt: '2026-01-01' }
+  const review = await service.review(draft)
+  assert.ok(review.changes.some((item) => item.path === 'profile.portfolio.url'))
+  await service.save({ ...draft, reviewToken: review.reviewToken })
+  state.portfolioPdfValid = false
+  const draft2 = { ...draft, content: structuredClone(draft.content) }
+  draft2.content.profile.portfolio.url = `https://${testBlobHost}/portfolio/other.pdf`
+  draft2.baseSha = state.head
+  await assert.rejects(service.review(draft2), /유효한 PDF/)
+})
+test('a portfolio URL is rejected outright when no blob store is configured', async () => {
+  const { draft, fetcher } = fixture()
+  draft.content.profile.portfolio = { label: '포트폴리오', url: `https://${testBlobHost}/portfolio/portfolio.pdf`, updatedAt: '2026-01-01' }
+  await assert.rejects(prepare(draft, null, fetcher), /설정되지 않아/)
 })
 test('merge and deployment are distinguished; absent records never mean deployed', async () => {
   const { github, state } = fixture()
