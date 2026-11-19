@@ -1,6 +1,37 @@
+/* Pretendard(OFL): content/site.json과 UI 문구에서 실제 쓰는 글자만 서브셋한 자체 호스팅 폰트.
+   외부 CDN 요청 없음. 새 한글 음절이 추가되면 `npm run fonts:subset`으로 다시 생성합니다. */
+@font-face {
+  font-family: 'Pretendard';
+  src: url('/fonts/pretendard/Pretendard-Regular.subset.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Pretendard';
+  src: url('/fonts/pretendard/Pretendard-Medium.subset.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Pretendard';
+  src: url('/fonts/pretendard/Pretendard-SemiBold.subset.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Pretendard';
+  src: url('/fonts/pretendard/Pretendard-Bold.subset.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* 공개 화면·편집 화면이 공유하는 디자인 토큰. 명함 색(--brand-1 앞면/--brand-2 뒷면/--on-brand 글자)을 바꾸면 전체에 반영됩니다. */
 :root {
-  font-family: system-ui, -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', 'Segoe UI', sans-serif;
+  font-family: 'Pretendard', system-ui, -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', 'Segoe UI', sans-serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -81,6 +112,7 @@ a:hover { color: var(--text); }
   color: var(--text);
   font-size: var(--fs-sm);
   line-height: 1.7;
+  letter-spacing: 0;
   word-break: keep-all;
   overflow-wrap: anywhere;
   -webkit-font-smoothing: antialiased;
@@ -123,12 +155,13 @@ a:hover { color: var(--text); }
 .school svg { color: var(--soft); flex: none; margin-top: 4px; }
 .hero h1 { margin: 0; font-size: var(--fs-display); line-height: 1.2; letter-spacing: -.02em; font-weight: 700; text-wrap: balance; }
 .role { margin: 10px 0 0; font-size: var(--fs-lg); font-weight: 600; color: var(--muted); }
-.lede { margin: 16px 0 0; font-size: var(--fs-md); line-height: 1.75; max-width: 560px; }
+.lede { margin: 16px 0 0; font-size: var(--fs-md); line-height: 1.75; max-width: 560px; text-wrap: pretty; }
 .ctas { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
 /* 카드가 아닌 조용한 2차 목록: 배경·테두리 없이 상단 구분선만 사용(.pdetail/.card만 카드 스타일을 가짐). */
 .board { border-top: 1px solid var(--line); padding-top: 4px; }
 .board h2 { margin: 0; padding: 14px 0 10px; font-size: var(--fs-2xs); font-weight: 600; color: var(--soft); }
-.prow { display: flex; align-items: center; gap: 14px; padding: 13px 6px; margin: 0 -6px; border-bottom: 1px solid var(--line); text-decoration: none; color: var(--text); border-radius: var(--radius-sm); transition: background .15s; }
+/* margin 없이 padding만 사용: .board의 상단 구분선과 행 너비·hover 배경이 정확히 일치합니다. */
+.prow { display: flex; align-items: center; gap: 14px; padding: 13px 6px; border-bottom: 1px solid var(--line); text-decoration: none; color: var(--text); border-radius: var(--radius-sm); transition: background .15s; }
 .prow:hover { background: var(--surface2); color: var(--text); }
 .prow i { width: 10px; height: 10px; border-radius: var(--radius-2xs); flex: none; }
 .prow > b { font-size: var(--fs-sm); min-width: 64px; color: var(--text); }
@@ -140,7 +173,7 @@ a:hover { color: var(--text); }
 .sec { padding: var(--space-section) 0; border-top: 1px solid var(--line); scroll-margin-top: 64px; }
 .sec-hd { margin-bottom: var(--space-block); }
 .sec-hd h2 { margin: 0; font-size: var(--fs-2xl); letter-spacing: -.01em; line-height: 1.3; text-wrap: balance; }
-.sec-hd p { margin: 8px 0 0; color: var(--muted); font-size: var(--fs-sm); }
+.sec-hd p { margin: 8px 0 0; color: var(--muted); font-size: var(--fs-sm); text-wrap: pretty; }
 
 /* projects */
 .px { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 28px; align-items: start; }
@@ -156,7 +189,7 @@ a:hover { color: var(--text); }
 .pd-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px 16px; flex-wrap: wrap; }
 .pd-top h3 { margin: 0; font-size: var(--fs-2xl); line-height: 1.2; display: flex; align-items: center; gap: 12px; text-wrap: balance; }
 .pd-top h3 i { width: 12px; height: 12px; border-radius: var(--radius-2xs); display: block; }
-.pd-one { margin: 6px 0 0; font-size: var(--fs-md); }
+.pd-one { margin: 6px 0 0; font-size: var(--fs-md); text-wrap: pretty; }
 .status { display: inline-flex; align-items: center; gap: 8px; font-size: var(--fs-2xs); padding: 5px 12px; border-radius: var(--radius-pill); border: 1px solid var(--line); color: var(--muted); white-space: nowrap; }
 .status i { width: 7px; height: 7px; border-radius: 50%; background: var(--soft); }
 .shot { margin: 24px 0 0; aspect-ratio: 16 / 9; border-radius: var(--radius-md); overflow: hidden; background: var(--shade); border: 1px solid var(--line); }
@@ -172,7 +205,7 @@ a:hover { color: var(--text); }
 .work { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; }
 .work li { position: relative; padding-left: 20px; font-size: var(--fs-sm); line-height: 1.7; }
 .work li::before { content: ''; position: absolute; left: 3px; top: 12px; width: 7px; height: 2px; border-radius: var(--radius-2xs); background: var(--soft); }
-.note { margin: 22px 0 0; padding: 16px 18px; border-radius: var(--radius-md); background: var(--surface2); font-size: var(--fs-xs); line-height: 1.75; color: var(--text); }
+.note { margin: 22px 0 0; padding: 16px 18px; border-radius: var(--radius-md); background: var(--surface2); font-size: var(--fs-xs); line-height: 1.75; color: var(--text); text-wrap: pretty; }
 .pd-foot { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 26px; }
 .pd-links { display: flex; gap: 8px; flex-wrap: wrap; }
 
@@ -205,7 +238,7 @@ a:hover { color: var(--text); }
 .way { display: flex; flex-direction: column; gap: 10px; padding: 22px 0 0; border-top: 1px solid var(--line); }
 .way h3 { margin: 0; font-size: var(--fs-lg); line-height: 1.4; }
 .way h3 small { display: block; font-size: var(--fs-2xs); font-weight: 500; color: var(--soft); }
-.way p { margin: 0; font-size: var(--fs-sm); }
+.way p { margin: 0; font-size: var(--fs-sm); text-wrap: pretty; }
 
 /* oss */
 .oss { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
@@ -213,7 +246,7 @@ a:hover { color: var(--text); }
 .oname { font-weight: 700; font-size: var(--fs-md); }
 /* impeccable-disable-next-line design-system-font: 저장소 경로(owner/repo) 전용 코드 스타일 모노스페이스, DESIGN.md에 의도적 예외로 기록됨 */
 .orepo { display: block; font-family: ui-monospace, 'Cascadia Code', Consolas, monospace; font-size: var(--fs-3xs); color: var(--soft); font-weight: 400; }
-.ochange { font-size: var(--fs-sm); }
+.ochange { font-size: var(--fs-sm); text-wrap: pretty; }
 .olink { display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 12px; border-radius: var(--radius-sm); border: 1px solid var(--line); color: var(--text); text-decoration: none; font-size: var(--fs-2xs); white-space: nowrap; }
 .olink:hover { background: var(--surface2); color: var(--text); }
 .olink em { font-style: normal; color: var(--muted); font-size: var(--fs-3xs); }
@@ -224,14 +257,14 @@ a:hover { color: var(--text); }
 .acts li { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 16px; padding: 14px 0; border-top: 1px solid var(--line); }
 .acts .when { font-size: var(--fs-2xs); color: var(--soft); padding-top: 1px; }
 .acts h3 { margin: 0; font-size: var(--fs-md); font-weight: 600; }
-.acts p { margin: 2px 0 0; color: var(--muted); font-size: var(--fs-xs); }
+.acts p { margin: 2px 0 0; color: var(--muted); font-size: var(--fs-xs); text-wrap: pretty; }
 
 /* contact */
 .card { display: grid; grid-template-columns: auto minmax(0, 1fr) minmax(0, 330px); gap: 28px; align-items: center; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-xl); padding: var(--space-block); }
 .avatar { width: 80px; height: 80px; border-radius: var(--radius-xl); background: var(--brand-2); color: var(--brand-1); display: grid; place-items: center; font-size: var(--fs-xl); font-weight: 700; object-fit: cover; }
 .card h3 { margin: 0; font-size: var(--fs-xl); }
 .card .who { margin: 2px 0 0; color: var(--muted); }
-.card .msg { margin: 12px 0 0; font-size: var(--fs-sm); }
+.card .msg { margin: 12px 0 0; font-size: var(--fs-sm); text-wrap: pretty; }
 .links { display: flex; flex-direction: column; gap: 8px; }
 .lk { display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 10px 14px; border-radius: var(--radius-md); border: 1px solid var(--line); color: var(--text); text-decoration: none; font-size: var(--fs-xs); transition: background .15s, border-color .15s; min-width: 0; }
 .lk:hover { background: var(--surface2); color: var(--text); border-color: var(--line-strong); }
