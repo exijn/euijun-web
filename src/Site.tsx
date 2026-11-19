@@ -151,7 +151,7 @@ export function Site({ content, preview = false }: { content: SiteContent; previ
         <div className="wrap">
           <div className="sec-hd"><h2 id="activity-title">학교 활동</h2><p>프로젝트 밖에서 사람들과 함께한 일입니다.</p></div>
           <ul className="acts">{activities.map((item) => (
-            <li key={item.id}><span className="when">{item.period}</span><div><h3>{item.title}</h3>{item.description && <p>{item.description}</p>}</div></li>
+            <li key={item.id}><span className="when">{item.period || '—'}</span><div><h3>{item.title}</h3>{item.description && <p>{item.description}</p>}</div></li>
           ))}</ul>
         </div>
       </section>}
