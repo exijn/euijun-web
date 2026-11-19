@@ -37,7 +37,7 @@ Name: 한의준 (English metadata name: Euijun Han). Visual identity is delibera
 
 ## Evidence on Hand
 
-`content/site.json` is the sole factual source: profile (school, role, two-line intro, GitHub/LinkedIn/email/domain, no photo/portfolio currently), three projects (GOMS, Washer, GSMC) each with team size, role, tech stack, and a short work list but no screenshots or cover images yet, a "해 온 일" list grouped by category, five published open-source PR contributions plus one unpublished, two school activities (one published, one unpublished), and a `skills` list that is not rendered on the public site. No testimonials, pricing, or case-study claims exist and none should be invented.
+`content/site.json` is the sole factual source: profile (school, role, two-line intro, GitHub/LinkedIn/email/domain, now including a profile photo; no portfolio PDF yet), three projects (GOMS, Washer, GSMC) each with team size, role, tech stack, a short work list, and now a representative cover mockup image (no additional in-app screenshots yet), a "해 온 일" list grouped by category, five published open-source PR contributions plus one unpublished, two school activities (one published, one unpublished), and a `skills` list that is not rendered on the public site. No testimonials, pricing, or case-study claims exist and none should be invented.
 
 ## Product Principles
 

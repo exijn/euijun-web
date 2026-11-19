@@ -17,53 +17,53 @@ colors:
   danger: "#e8a08f"
 typography:
   display:
-    fontFamily: "system-ui, -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', 'Segoe UI', sans-serif"
+    fontFamily: "'Pretendard', system-ui, -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', 'Segoe UI', sans-serif"
     fontSize: "52px"
     fontWeight: 700
     lineHeight: 1.2
     letterSpacing: "-0.02em"
   display-sm:
-    fontFamily: "system-ui, -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', 'Segoe UI', sans-serif"
+    fontFamily: "'Pretendard', system-ui, -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', 'Segoe UI', sans-serif"
     fontSize: "40px"
     fontWeight: 700
     lineHeight: 1.2
   headline:
-    fontFamily: "system-ui, -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', 'Segoe UI', sans-serif"
+    fontFamily: "'Pretendard', system-ui, -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', 'Segoe UI', sans-serif"
     fontSize: "28px"
     fontWeight: 700
     lineHeight: 1.3
   xl:
-    fontFamily: "system-ui, -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', 'Segoe UI', sans-serif"
+    fontFamily: "'Pretendard', system-ui, -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', 'Segoe UI', sans-serif"
     fontSize: "24px"
     fontWeight: 700
     lineHeight: 1.3
   lg:
-    fontFamily: "system-ui, -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', 'Segoe UI', sans-serif"
+    fontFamily: "'Pretendard', system-ui, -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', 'Segoe UI', sans-serif"
     fontSize: "20px"
     fontWeight: 600
     lineHeight: 1.4
   title:
-    fontFamily: "system-ui, -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', 'Segoe UI', sans-serif"
+    fontFamily: "'Pretendard', system-ui, -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', 'Segoe UI', sans-serif"
     fontSize: "18px"
     fontWeight: 700
     lineHeight: 1.4
   body:
-    fontFamily: "system-ui, -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', 'Segoe UI', sans-serif"
+    fontFamily: "'Pretendard', system-ui, -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', 'Segoe UI', sans-serif"
     fontSize: "16px"
     fontWeight: 400
     lineHeight: 1.7
   xs:
-    fontFamily: "system-ui, -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', 'Segoe UI', sans-serif"
+    fontFamily: "'Pretendard', system-ui, -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', 'Segoe UI', sans-serif"
     fontSize: "15px"
     fontWeight: 400
     lineHeight: 1.4
   label:
-    fontFamily: "system-ui, -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', 'Segoe UI', sans-serif"
+    fontFamily: "'Pretendard', system-ui, -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', 'Segoe UI', sans-serif"
     fontSize: "14px"
     fontWeight: 600
     lineHeight: 1.4
   meta:
-    fontFamily: "system-ui, -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', 'Segoe UI', sans-serif"
+    fontFamily: "'Pretendard', system-ui, -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', 'Segoe UI', sans-serif"
     fontSize: "13px"
     fontWeight: 400
     lineHeight: 1.4
@@ -111,7 +111,7 @@ Confirmed visual rejections: no gradients, no glow/neon, no grain texture, no cu
 - Flat graphite surfaces layered by lightness (`bg` → `surface` → `surface2`), never by shadow.
 - One accent color (`brand-1`) reserved for interactive affordances only — never decoration.
 - Generous, text-first spacing on a 3-step section/block rhythm; sections separated by a hairline rule, not a card boundary.
-- Korean body copy set at 16px/1.7 as the working default, not a Latin system-font afterthought.
+- Korean body copy set at 16px/1.7, letter-spacing 0, as the working default — self-hosted Pretendard now, not a Latin system-font afterthought.
 - One shared token set (`:root` in `src/styles.css`) drives both the public site and the private editor — no parallel naming.
 
 ## Colors
@@ -142,9 +142,11 @@ A near-monochrome graphite palette with a single cool accent; color signals inte
 
 ## Typography
 
-**Body/Display Font:** system-ui, -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', 'Segoe UI', sans-serif (no self-hosted webfont currently loaded)
+**Body/Display Font:** 'Pretendard' (self-hosted, OFL), falling back to system-ui, -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', 'Segoe UI', sans-serif if the webfont fails to load.
 
-**Character:** A plain system stack chosen for Korean legibility (Apple SD Gothic Neo / Malgun Gothic fall back correctly) over a distinctive display face; the system currently carries no typographic personality beyond size and weight contrast.
+**Character:** Pretendard was designed to unify the look of Apple SD Gothic Neo and Malgun Gothic across platforms, so the swap is a deliberate refinement of the same character rather than a personality change — crisper stroke contrast and more consistent Hangul/Latin pairing than any one system font gives alone.
+
+**Self-hosting:** Subset to exactly the characters used in `content/site.json` and the UI copy (4 weights × ~41.5 KB woff2, `font-display: swap`, no external request). Regenerate with `npm run fonts:subset` after adding content with Hangul syllables outside the current subset — until then, only the new syllables fall back to the system font, not the whole page. License: `public/fonts/pretendard/LICENSE` (SIL OFL 1.1).
 
 ### Hierarchy
 9-step scale (`--fs-3xs` … `--fs-display`), shared by the public site and the editor so no element declares a one-off size:
@@ -159,7 +161,7 @@ A near-monochrome graphite palette with a single cool accent; color signals inte
 - **Meta** (13px): the smallest tier — fact labels, repo paths, footnote text.
 
 ### Named Rules
-**The No-Webfont Gap.** The current stack is a correct Korean-safe system default, but it is also the single most "default-looking" surface in the system — the first thing worth deliberately upgrading (e.g. a self-hosted Pretendard) without changing size/weight relationships already established here.
+**The Subset Discipline Rule.** Pretendard ships only the glyphs this site actually renders, not full Hangul coverage. A new syllable the subset lacks is a cue to run `npm run fonts:subset`, not a reason to widen the subset preemptively.
 
 **The One Mono Exception.** `ui-monospace, 'Cascadia Code', Consolas, monospace` is the one deliberate departure from the system sans, used only on `.orepo` to set a GitHub `owner/repo` path in a code-like register. It is not drift and should not be expanded to other labels.
 
