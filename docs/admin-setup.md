@@ -48,7 +48,7 @@ console.log(randomBytes(32).toString('base64'))
 
 1. GitHub `exijn/euijun-web` 저장소를 Vercel Git 연동으로 연결합니다.
 2. Root Directory는 저장소 루트, Node.js **24.x**, Build Command는 `npm run build`, Output Directory는 `dist`입니다. `vercel.json`의 설정을 사용합니다.
-3. `api/index.ts`가 Node 함수입니다. 인증된 관리 HTML·JS·CSS는 `.private/**`에서 함수가 읽습니다. **`.private`를 정적 공개 폴더에 복사하지 마세요.** 공개 페이지의 JS에는 관리 코드가 없습니다.
+3. `api/index.js`가 Node 함수입니다(`npm run build`가 `server/vercel.ts`를 하나의 파일로 번들링해 생성하며, Git에는 커밋하지 않습니다). 인증된 관리 HTML·JS·CSS는 `.private/**`에서 함수가 읽습니다. **`.private`를 정적 공개 폴더에 복사하지 마세요.** 공개 페이지의 JS에는 관리 코드가 없습니다. `server/`가 상대 경로 import에 `.ts` 확장자를 쓰는 것은(`node server/index.ts`로 바로 실행하는 로컬 흐름을 위해 필요) Vercel의 Node 함수 빌더가 그대로 추적하지 못하므로, 배포되는 함수만 별도로 번들링합니다.
 4. 서버 비밀 값은 **Production 환경에만** 등록하고, 외부 기여자 PR·fork·검증되지 않은 Preview에는 제공하지 마세요. 빌드 코드는 환경 변수에 접근할 수 있으므로 신뢰할 수 없는 코드를 secret이 있는 환경에서 실행하지 않습니다.
 5. Production Branch를 GitHub 저장소의 실제 기본 브랜치로 지정합니다. 서버는 API로 기본 브랜치를 매번 조회하며 main/master를 하드코딩하지 않습니다.
 6. 도메인 DNS와 HTTPS, OAuth callback을 확인합니다. 공개 URL을 바꾸면 콘텐츠의 website/domain과 APP_ORIGIN·OAuth callback도 함께 변경합니다.
@@ -111,7 +111,7 @@ console.log(randomBytes(32).toString('base64'))
 - 이미지 포맷·magic bytes·해상도를 검사하고 WebP 재인코딩합니다. HTML/SVG/스크립트 파일을 업로드할 수 없습니다. 증명사진·프로젝트 대표 목업·화면 캡처 모두 같은 검증을 거치며 용도별 최대 치수만 다릅니다(사진 800×800, 목업 1600×900, 캡처 긴 변 1600, 모두 비율 유지·자르지 않음).
 - 포트폴리오 PDF 업로드 토큰 발급(`/api/manage/blob-upload`)도 다른 쓰기 API와 같은 세션·CSRF·Origin·요청 제한을 적용하며, `application/pdf`·`portfolio/` 경로·20 MB 이하로만 토큰을 내줍니다. 저장 시 서버가 URL 호스트와 PDF 매직바이트를 다시 확인합니다.
 - 저장된 일반 텍스트는 React가 escape합니다. 링크는 HTTPS, 이미지 경로는 허용된 프로젝트 raster 경로만 받습니다.
-- `tests/fixture-server.ts`는 로컬 합성 테스트 서버입니다. 운영 진입점은 `server/index.ts` 또는 `api/index.ts`뿐입니다. fixture 서버를 배포하지 마세요.
+- `tests/fixture-server.ts`는 로컬 합성 테스트 서버입니다. 운영 진입점은 `server/index.ts`(독립 Node 서버) 또는 `server/vercel.ts`에서 빌드되는 `api/index.js`(Vercel 함수)뿐입니다. fixture 서버를 배포하지 마세요.
 - 릴리스 전 토큰 최소 권한, GitHub branch protection, 플랫폼 WAF, CDN 캐시, 실제 계정 거부, 토큰 만료·갱신, 복구 절차를 확인하세요.
 
 ## 공식 자료

@@ -206,3 +206,19 @@ test('production public artifacts contain no private routes, schema validator or
   for (const file of ['dist/index.html', 'dist/robots.txt', 'dist/sitemap.xml']) assert.doesNotMatch(readFileSync(file, 'utf8'), /manage|private-assets|auth\/github/)
   assert.ok(readdirSync('.private/assets').some((name) => name.endsWith('.js')))
 })
+test('the Vercel function bundle is self-contained: no unresolved local .ts imports, deps left external, no secrets', () => {
+  const bundle = readFileSync('api/index.js', 'utf8')
+  // Relative imports with an explicit .ts extension are exactly what breaks Vercel's Node function
+  // builder (it transpiles files but doesn't rewrite .ts extensions in import specifiers, so the
+  // compiled output ends up requiring a file that no longer exists). The bundle must contain none.
+  assert.doesNotMatch(bundle, /from ["']\.\.?\/[^"']*\.ts["']/)
+  // The server's own code (not just its export) must actually be inlined, not just re-exported.
+  assert.match(bundle, /createHandler/)
+  assert.match(bundle, /verifyPortfolioUrl|portfolioUploadConstraints/)
+  // npm dependencies stay external so Vercel traces them from node_modules (sharp needs its native
+  // platform binary, which a bundler cannot inline).
+  for (const dep of ['"sharp"', '"zod"', '"@vercel/blob/client"']) assert.match(bundle, new RegExp(`from ${dep}`))
+  // process.env.GITHUB_CONTENT_TOKEN etc. (the var *names*) are expected — the server reads them at
+  // runtime. Only a literal secret *value* (e.g. a test fixture) leaking in would be a real problem.
+  assert.doesNotMatch(bundle, /fixture-repo-token|fixture-oauth-secret/)
+})

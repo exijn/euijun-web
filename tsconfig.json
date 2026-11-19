@@ -16,5 +16,5 @@
     "erasableSyntaxOnly": true,
     "types": ["vite/client", "node"]
   },
-  "include": ["src", "shared", "server", "admin", "api", "vite.config.ts", "vite.admin.config.ts", "playwright.config.ts", "tests"]
+  "include": ["src", "shared", "server", "admin", "vite.config.ts", "vite.admin.config.ts", "vite.server.config.ts", "playwright.config.ts", "tests"]
 }
