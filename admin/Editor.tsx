@@ -3,7 +3,7 @@ import { upload as uploadToBlob } from '@vercel/blob/client'
 import { contentSchema, validationMessages, type SiteContent, type Screenshot, type ProjectDocument } from '../shared/content'
 import { Site } from '../src/Site'
 
-type FieldDefinition = { key: string; label: string; kind?: 'long' | 'list' | 'number' | 'status' | 'color' }
+type FieldDefinition = { key: string; label: string; kind?: 'long' | 'list' | 'number' | 'status' | 'color' | 'email' | 'url' }
 type Review = { reviewToken: string; changes: { path: string; before: string; after: string }[]; images: string[] }
 type SaveResult = { number: number; url: string; message: string; phase: string }
 type UploadKind = 'profilePhoto' | 'projectImage' | 'projectScreenshot'
@@ -20,9 +20,9 @@ const profileFields: FieldDefinition[] = [
   { key: 'name', label: '이름' }, { key: 'englishName', label: '영문 이름 (메타데이터용)' }, { key: 'role', label: '직무' },
   { key: 'tagline', label: '첫 소개 문장' }, { key: 'introduction', label: '첫 소개 둘째 문장', kind: 'long' },
   { key: 'school', label: '학교 (첫 화면, 학교·학과·재학 상태 전체)' }, { key: 'schoolShort', label: '학교 (짧게, 연락 카드)' },
-  { key: 'email', label: '공개 이메일 (비우면 숨김)' }, { key: 'github', label: 'GitHub URL' },
-  { key: 'linkedin', label: 'LinkedIn URL (비우면 숨김)' },
-  { key: 'website', label: '사이트 URL (https://exijn.com 형태)' }, { key: 'domain', label: '표시할 도메인' }, { key: 'contactText', label: '연락 문구' },
+  { key: 'email', label: '공개 이메일 (비우면 숨김)', kind: 'email' }, { key: 'github', label: 'GitHub URL', kind: 'url' },
+  { key: 'linkedin', label: 'LinkedIn URL (비우면 숨김)', kind: 'url' },
+  { key: 'website', label: '사이트 URL (https://exijn.com 형태)', kind: 'url' }, { key: 'domain', label: '표시할 도메인' }, { key: 'contactText', label: '연락 문구' },
 ]
 const projectFields: FieldDefinition[] = [
   { key: 'id', label: '고유 ID' }, { key: 'name', label: '프로젝트명' }, { key: 'headline', label: '한 줄 설명' },
@@ -30,14 +30,14 @@ const projectFields: FieldDefinition[] = [
   { key: 'status', label: '현재 상태 (직접 확인했을 때만 입력, 비우면 공개 화면에 표시 안 됨)' }, { key: 'color', label: '표시 색', kind: 'color' },
   { key: 'technologies', label: '기술 (한 줄에 하나)', kind: 'list' },
   { key: 'work', label: '맡은 일 (한 줄에 하나)', kind: 'list' }, { key: 'note', label: '강조 문장 (선택)', kind: 'long' },
-  { key: 'github', label: 'GitHub 저장소 URL' },
+  { key: 'github', label: 'GitHub 저장소 URL', kind: 'url' },
   { key: 'image', label: '이미지 경로 (업로드 시 자동 지정)' }, { key: 'imageAlt', label: '이미지 설명 (alt)' },
 ]
 const screenshotFields: FieldDefinition[] = [
   { key: 'alt', label: '화면 설명 (alt)' }, { key: 'caption', label: '캡션 (선택)' },
 ]
 const documentFields: FieldDefinition[] = [
-  { key: 'label', label: '문서 이름' }, { key: 'url', label: '문서 URL (https://)' },
+  { key: 'label', label: '문서 이름' }, { key: 'url', label: '문서 URL (https://)', kind: 'url' },
 ]
 const wayFields: FieldDefinition[] = [
   { key: 'id', label: '고유 ID' }, { key: 'title', label: '제목' }, { key: 'sub', label: '관련 프로젝트' }, { key: 'text', label: '설명', kind: 'long' },
@@ -45,7 +45,7 @@ const wayFields: FieldDefinition[] = [
 const contributionFields: FieldDefinition[] = [
   { key: 'id', label: '고유 ID' }, { key: 'name', label: '프로젝트명' }, { key: 'repo', label: '저장소 (owner/name)' },
   { key: 'number', label: 'PR 번호', kind: 'number' }, { key: 'description', label: '바꾼 내용', kind: 'long' },
-  { key: 'status', label: 'PR 상태', kind: 'status' }, { key: 'url', label: 'PR URL' },
+  { key: 'status', label: 'PR 상태', kind: 'status' }, { key: 'url', label: 'PR URL', kind: 'url' },
 ]
 const uploadKey = (target: { kind: UploadKind; projectId?: string; screenshotId?: string }) => `${target.kind}:${target.projectId ?? ''}:${target.screenshotId ?? ''}`
 
@@ -57,7 +57,10 @@ function Field({ field, value, change }: { field: FieldDefinition; value: unknow
     {field.kind === 'status' ? <select id={id} value={displayed} onChange={(event) => change(event.target.value)}><option value="merged">병합됨</option><option value="open">검토 중</option><option value="closed">종료됨</option><option value="reverted">되돌려짐 (공개 제외)</option></select>
       : field.kind === 'color' ? <select id={id} value={displayed} onChange={(event) => change(event.target.value)}>{COLOR_OPTIONS.map((option) => <option key={option.value} value={option.value}>{option.label} ({option.value})</option>)}</select>
         : field.kind === 'long' || list ? <textarea id={id} rows={list ? 4 : 3} value={displayed} onChange={(event) => change(list ? event.target.value.split('\n') : event.target.value)} />
-          : <input id={id} type={field.kind === 'number' ? 'number' : 'text'} value={displayed} onChange={(event) => change(field.kind === 'number' ? Number(event.target.value) : event.target.value)} />}
+          : <input id={id} type={field.kind === 'number' ? 'number' : field.kind === 'email' ? 'email' : field.kind === 'url' ? 'url' : 'text'}
+              inputMode={field.kind === 'email' ? 'email' : field.kind === 'url' ? 'url' : undefined}
+              autoComplete={field.kind === 'email' ? 'email' : field.kind === 'url' ? 'url' : undefined}
+              value={displayed} onChange={(event) => change(field.kind === 'number' ? Number(event.target.value) : event.target.value)} />}
   </label>
 }
 
