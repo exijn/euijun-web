@@ -56,7 +56,7 @@ export function createHandler({ config, root = process.cwd(), fetcher = fetch, b
       const privateRoute = path === '/manage' || path.startsWith('/manage/') || path.startsWith('/api/') || path.startsWith('/auth/') || path.startsWith('/private-assets/')
       if (!privateRoute) {
         if (!['GET', 'HEAD'].includes(req.method ?? '')) throw new HttpError(405, 'METHOD', 'Method not allowed')
-        if (!/^\/(?:$|index\.html$|favicon\.svg$|robots\.txt$|sitemap\.xml$|assets\/[a-zA-Z0-9_.-]+$|images\/[a-zA-Z0-9/_.-]+$)/.test(path) || path.includes('..') || path.includes('\\')) throw new HttpError(404, 'NOT_FOUND', 'Not found')
+        if (!/^\/(?:$|index\.html$|favicon\.svg$|robots\.txt$|sitemap\.xml$|assets\/[a-zA-Z0-9_.-]+$|images\/[a-zA-Z0-9/_.-]+$|fonts\/[a-zA-Z0-9/_.-]+$)/.test(path) || path.includes('..') || path.includes('\\')) throw new HttpError(404, 'NOT_FOUND', 'Not found')
         return await serve(res, 'dist', path === '/' ? '/index.html' : path, req.method === 'HEAD')
       }
       res.setHeader('Cache-Control', 'private, no-store, max-age=0')
