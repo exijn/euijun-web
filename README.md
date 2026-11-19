@@ -42,7 +42,7 @@ npm start
 - 빈 GitHub·LinkedIn·이메일은 버튼을 표시하지 않습니다. 전화번호 필드는 없습니다.
 - 오픈소스는 공개(`published: true`)이고 `reverted`가 아닌 전체 항목을 표시합니다. PR URL과 번호가 일치해야 합니다.
 - 프로젝트의 `color`는 `#rrggbb` 형식이며 프로젝트 탭·보드의 식별 점 색상입니다.
-- 색상 변수는 `src/styles.css`의 `.site` 블록 상단(`--brand-1`, `--brand-2`, `--on-brand` 등)에서, 간격·레이아웃도 같은 파일에서 수정합니다.
+- 색상·타이포·간격 변수는 `src/styles.css`의 `:root` 블록 상단(`--brand-1`, `--brand-2`, `--on-brand`, `--fs-*`, `--space-*` 등)에서 수정합니다. 편집 화면(`admin/editor.css`)도 같은 토큰을 참조하므로 한 곳만 바꾸면 전체에 반영됩니다.
 - title·description·canonical·OG 텍스트·Person·noscript·robots·sitemap은 빌드 시 프로필에서 생성됩니다. 도메인 변경 시 `website`와 `domain`을 함께 변경하세요.
 
 ## 이미지 교체
