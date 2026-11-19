@@ -14,7 +14,7 @@
     "website": "https://exijn.com",
     "domain": "exijn.com",
     "contactText": "프로젝트나 오픈소스 이야기라면 편하게 연락 주세요.",
-    "photo": { "image": "", "alt": "" },
+    "photo": { "image": "/images/profile/profile-photo.webp", "alt": "한의준 증명사진" },
     "portfolio": { "label": "", "url": "", "updatedAt": "" }
   },
   "projects": [
@@ -35,8 +35,8 @@
         "운영과 모니터링"
       ],
       "note": "기능 구현에서 끝나지 않고, 학생들이 실제로 쓰는 흐름과 운영 중 생기는 문제까지 맡았습니다.",
-      "image": "",
-      "imageAlt": "",
+      "image": "/images/projects/goms/goms-mockup.webp",
+      "imageAlt": "GOMS 앱 화면 목업: 로그인, 외출 현황, 지도 화면",
       "github": "https://github.com/team-haribo/GOMS-Backend-V3",
       "screenshots": [],
       "documents": []
@@ -57,8 +57,8 @@
         "기기 상태·예약·알림에서 생기는 예외 상황 분석"
       ],
       "note": "",
-      "image": "",
-      "imageAlt": "",
+      "image": "/images/projects/washer/washer-mockup.webp",
+      "imageAlt": "Washer 앱 화면 목업: 세탁기·건조기 예약 현황 화면",
       "github": "https://github.com/team-washer/Washer-Backend-v2",
       "screenshots": [],
       "documents": []
@@ -80,8 +80,8 @@
         "협업 과정과 결정 사항 문서화"
       ],
       "note": "",
-      "image": "",
-      "imageAlt": "",
+      "image": "/images/projects/gsmc/gsmc-mockup.webp",
+      "imageAlt": "GSMC 웹 화면 목업: 인증 점수, 심사 요청, 학생 조회 화면",
       "github": "https://github.com/team-incube/GSMC-Server-V4",
       "screenshots": [],
       "documents": []
