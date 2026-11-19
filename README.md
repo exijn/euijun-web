@@ -106,7 +106,7 @@ npm run test:e2e
 - `shared/content.ts`: TypeScript 타입·런타임 검증·비공개 항목 필터
 - `admin/`: 별도 편집 UI (빌드 결과 `.private/`, 공개 배포 폴더가 아님)
 - `server/`: OAuth·세션·CSRF·이미지 검증·GitHub 저장·Vercel Blob 업로드 토큰 발급(`server/blob.ts`)
-- `server/vercel.ts`: Vercel 서버리스 함수 진입점 소스. 빌드(`vite build --config vite.server.config.ts`) 시 `api/index.js`(Git에서 제외된 생성 파일)로 번들됩니다. `server/`·`shared/`의 상대 경로 import만 하나의 파일로 합치고, `sharp`·`zod`·`@vercel/blob`은 번들에 포함하지 않고 그대로 두어 Vercel이 `node_modules`에서 추적하게 합니다(네이티브 바이너리가 있는 `sharp` 때문에 필요). `vercel.json`은 이 생성된 `api/index.js`를 함수로 지정합니다.
+- `server/vercel.ts`: Vercel 서버리스 함수 진입점 소스. 빌드(`vite build --config vite.server.config.ts`) 시 `api/index.js`로 번들됩니다. `server/`·`shared/`의 상대 경로 import만 하나의 파일로 합치고, `sharp`·`zod`·`@vercel/blob`은 번들에 포함하지 않고 그대로 두어 Vercel이 `node_modules`에서 추적하게 합니다(네이티브 바이너리가 있는 `sharp` 때문에 필요). `vercel.json`은 이 `api/index.js`를 함수로 지정합니다. **`api/index.js`는 Git에 커밋되는 생성 파일입니다**(Vercel이 커스텀 `buildCommand` 실행 전, 저장소 체크아웃 시점의 `api/` 디렉터리만 보고 함수를 찾기 때문에 빌드 중 새로 생기는 파일은 인식하지 못합니다). `server/`·`shared/`를 바꾸면 반드시 `npm run build`로 다시 생성해 함께 커밋하세요. CI가 커밋된 파일이 최신 빌드와 일치하는지 확인합니다.
 - `tests/`: 보안·동시 수정·이미지·브라우저 회귀 검사
 - `docs/archive/initial-content.json`: 리디자인 전 실제 콘텐츠 보존본
 

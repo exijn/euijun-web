@@ -48,7 +48,7 @@ console.log(randomBytes(32).toString('base64'))
 
 1. GitHub `exijn/euijun-web` 저장소를 Vercel Git 연동으로 연결합니다.
 2. Root Directory는 저장소 루트, Node.js **24.x**, Build Command는 `npm run build`, Output Directory는 `dist`입니다. `vercel.json`의 설정을 사용합니다.
-3. `api/index.js`가 Node 함수입니다(`npm run build`가 `server/vercel.ts`를 하나의 파일로 번들링해 생성하며, Git에는 커밋하지 않습니다). 인증된 관리 HTML·JS·CSS는 `.private/**`에서 함수가 읽습니다. **`.private`를 정적 공개 폴더에 복사하지 마세요.** 공개 페이지의 JS에는 관리 코드가 없습니다. `server/`가 상대 경로 import에 `.ts` 확장자를 쓰는 것은(`node server/index.ts`로 바로 실행하는 로컬 흐름을 위해 필요) Vercel의 Node 함수 빌더가 그대로 추적하지 못하므로, 배포되는 함수만 별도로 번들링합니다.
+3. `api/index.js`가 Node 함수입니다(`npm run build`가 `server/vercel.ts`를 하나의 파일로 번들링해 생성하는 파일이며, Vercel이 커스텀 `buildCommand` 실행 전 저장소 체크아웃 상태의 `api/` 디렉터리만 보고 함수를 찾기 때문에 **Git에 커밋되어 있어야 합니다**. `server/`·`shared/`를 바꾸면 반드시 다시 빌드해 갱신된 `api/index.js`를 함께 커밋하세요. CI가 커밋된 파일이 최신 빌드와 일치하는지 확인합니다). 인증된 관리 HTML·JS·CSS는 `.private/**`에서 함수가 읽습니다. **`.private`를 정적 공개 폴더에 복사하지 마세요.** 공개 페이지의 JS에는 관리 코드가 없습니다. `server/`가 상대 경로 import에 `.ts` 확장자를 쓰는 것은(`node server/index.ts`로 바로 실행하는 로컬 흐름을 위해 필요) Vercel의 Node 함수 빌더가 그대로 추적하지 못하므로, 배포되는 함수만 별도로 번들링합니다.
 4. 서버 비밀 값은 **Production 환경에만** 등록하고, 외부 기여자 PR·fork·검증되지 않은 Preview에는 제공하지 마세요. 빌드 코드는 환경 변수에 접근할 수 있으므로 신뢰할 수 없는 코드를 secret이 있는 환경에서 실행하지 않습니다.
 5. Production Branch를 GitHub 저장소의 실제 기본 브랜치로 지정합니다. 서버는 API로 기본 브랜치를 매번 조회하며 main/master를 하드코딩하지 않습니다.
 6. 도메인 DNS와 HTTPS, OAuth callback을 확인합니다. 공개 URL을 바꾸면 콘텐츠의 website/domain과 APP_ORIGIN·OAuth callback도 함께 변경합니다.

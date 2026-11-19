@@ -9,6 +9,12 @@ import { defineConfig } from 'vite'
 // (sharp, zod, @vercel/blob) are left external so Vercel's own dependency tracing pulls them from
 // node_modules as usual — sharp in particular needs its platform-specific native binary, which must
 // come from node_modules rather than be inlined by a bundler.
+//
+// The output (api/index.js) is committed to git, not gitignored: Vercel's Node.js function
+// detection scans the `api/` directory of the pre-build repository checkout before running any
+// custom buildCommand, so a function file that only exists after our build step runs is invisible
+// to it ("doesn't match any Serverless Functions inside the api directory"). CI verifies the
+// committed file is never stale (see .github/workflows/check.yml).
 const external = ['zod', 'sharp', '@vercel/blob', '@vercel/blob/client']
 
 export default defineConfig({
